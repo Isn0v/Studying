@@ -1,0 +1,12 @@
+D:\Documents\Projects\MatrixGUI\bin\Debug\MatrixGUI.exe.config
+D:\Documents\Projects\MatrixGUI\bin\Debug\MatrixGUI.exe
+D:\Documents\Projects\MatrixGUI\bin\Debug\MatrixGUI.pdb
+D:\Documents\Projects\MatrixGUI\obj\Debug\MatrixGUI.csproj.AssemblyReference.cache
+D:\Documents\Projects\MatrixGUI\obj\Debug\MatrixGUI.csproj.SuggestedBindingRedirects.cache
+D:\Documents\Projects\MatrixGUI\obj\Debug\MatrixGUI.MainForm.resources
+D:\Documents\Projects\MatrixGUI\obj\Debug\MatrixGUI.Properties.Resources.resources
+D:\Documents\Projects\MatrixGUI\obj\Debug\MatrixGUI.csproj.GenerateResource.cache
+D:\Documents\Projects\MatrixGUI\obj\Debug\MatrixGUI.csproj.CoreCompileInputs.cache
+D:\Documents\Projects\MatrixGUI\obj\Debug\MatrixGUI.exe
+D:\Documents\Projects\MatrixGUI\obj\Debug\MatrixGUI.pdb
+D:\Documents\Projects\MatrixGUI\obj\Debug\MatrixGUI.MatrixControlForm.resources
