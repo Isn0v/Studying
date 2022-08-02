@@ -163,6 +163,19 @@ namespace BST
         {
             return inOrderTraversalList()[index];
         }
+        public int Search(T value)
+        {
+            Node<T> tmp = new Node<T>(value);
+            List<Node<T>> list = inOrderTraversalList();
+            for(int i =0; i < list.Count; i++)
+            {
+                if(list[i] == tmp)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
 
         public IEnumerator<Node<T>> GetEnumerator() //Здесь могут быть проблемы. Нужно будет обсудить на занятии
         {
