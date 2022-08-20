@@ -1,2 +1,2 @@
 # Studying
-Any projects during learning coding
+Any projects during studying
