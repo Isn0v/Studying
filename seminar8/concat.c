@@ -8,7 +8,6 @@ int concatArrs(int* resArr, int* arr1, size_t size1, int* arr2, size_t size2){
         return 0;
     }
     
-
     for(size_t i = 0; i < size1; i++){
         resArr[i] = arr1[i];
     }
