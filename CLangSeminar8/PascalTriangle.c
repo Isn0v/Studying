@@ -36,7 +36,7 @@ int** createPascalTriangle(int N){
 int fillWithBinomCoef(int** matrix, int N){
     for(int i = 0; i < N; i++){
         for(int j = 0; j < i + 1; j++){
-            matrix[i][j] = binomCoef(j ,i);
+            matrix[i][j] = binomCoef(j, i);
         }
     }
     return 1;
