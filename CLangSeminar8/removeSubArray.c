@@ -80,6 +80,6 @@ int main() {
     for(size_t  i = 0; i < size1; i++){
         printf("%d ", arr1[i]);
     }
-    free(
+    free(arr1);
 }
 
