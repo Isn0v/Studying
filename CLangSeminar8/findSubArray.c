@@ -16,7 +16,7 @@ int findSubArr(int* arr1, size_t size1, int* arr2, size_t size2){
         }
     }
 
-    return 1;
+    return -1;
 }
 
 
