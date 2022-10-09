@@ -31,7 +31,7 @@ int main() {
         printf("Allocation error");
     }
 
-    if(!concatArrs(resArr, arr1, 6, arr2, 7)){
+    if(!concatArrs(resArr, arr1, size1, arr2, size2)){
         exit(1); //error
     }
 
