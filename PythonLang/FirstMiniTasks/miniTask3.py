@@ -1,8 +1,6 @@
-st = "1 2 | 3 4"
+st = "1.0 2.0 | 3.0 4.0"
 matr = []
-for i in st.split("|"):
-    matr.append(list(i.split(" ")))
+for i in st.split(" | "):
+    matr.append(list(map(float, list(i.split(" ")))))
 
-for lst in matr:
-    lst.remove('')
-print(matr[0][1])
+print(matr)
