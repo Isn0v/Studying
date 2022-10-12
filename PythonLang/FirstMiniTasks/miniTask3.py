@@ -3,4 +3,4 @@ matr = []
 for i in st.split(" | "):
     matr.append(list(map(float, list(i.split(" ")))))
 
-print(matr)
+print(matr) #matr[row][col]
