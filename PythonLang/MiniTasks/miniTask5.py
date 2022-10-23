@@ -1,13 +1,8 @@
 def mult(x, y, z):
     return x + y + z
 
-#Doesn't work with functions of variable counts of args
-#like mult(*args)
 def specialize(function, *args, **kwargs):
-    args_count = len(args) + len(kwargs.keys())
-    if args_count > function.__code__.co_argcount:
-        raise Exception(f"Got more arguments, than function can allow")
-    elif args_count == function.__code__.co_argcount:
+    if args_count == function.__code__.co_argcount:
         def new_function():
             return function(*args, **kwargs)
     else:
