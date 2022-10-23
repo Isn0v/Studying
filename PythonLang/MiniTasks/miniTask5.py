@@ -2,6 +2,7 @@ def mult(x, y, z):
     return x + y + z
 
 def specialize(function, *args, **kwargs):
+    args_count = len(args) + len(kwargs)
     if args_count == function.__code__.co_argcount:
         def new_function():
             return function(*args, **kwargs)
