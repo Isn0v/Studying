@@ -10,7 +10,10 @@ try:
         else:
             new_key_value.append([old_value, old_key])
     for lst in new_key_value:
-        dict_new[lst[0]] = tuple(lst[1:])
+        if len(lst[1:]) != 1:
+            dict_new[lst[0]] = tuple(lst[1:])
+        else:
+            dict_new[lst[0]] = lst[1]
 
 except Exception:
     print("Error")
