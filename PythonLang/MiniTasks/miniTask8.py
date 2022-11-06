@@ -1,28 +1,32 @@
 import functools
 
-def deprecated(func=None, since=None, will_be_removed=None):
+def deprecated(func=None, since='', will_be_removed=''):
 
     if func is None:
         return functools.partial(deprecated, since=since, will_be_removed=will_be_removed)
 
     def decor(*args, **kwargs):
-        if since and will_be_removed:
-            print(f"Warning: function {func.__name__} is deprecated since version {since}. It will be removed in version {will_be_removed}")   
-        elif will_be_removed: 
-            print(f"Warning: function {func.__name__} is deprecated. It will be removed in version {will_be_removed}")
-        elif since:
-            print(f"Warning: function {func.__name__} is deprecated since version {since}. It will be removed in future versions")
+
+        st_default = f"Warning: function {func.__name__} is deprecated"
+
+        if since:
+            st_default += f" since version {since}"
+
+        if will_be_removed:
+            st_default += f". It will be removed in version {will_be_removed}."
         else:
-            print(f"Warning: function {func.__name__} is deprecated. It will be removed in future versions.")
-        return func()
+            st_default += f". It will be removed in future versions."
+
+        print(st_default)
+        func(*args, **kwargs)
 
     return decor
 
 
-@deprecated
-def foo():
-    print("Hi!!!")
+@deprecated(since='1.1.0', will_be_removed='1.2.5')
+def foo(a, b):
+    print(f"Hi!!!, {a + b}")
 
 
-foo()
+foo(1, 2)
         
