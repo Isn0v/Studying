@@ -1,0 +1,8 @@
+*.out
+*.exe
+*.sh
+*.o
+*.txt
+
+.vscode/
+*/.vscode/
