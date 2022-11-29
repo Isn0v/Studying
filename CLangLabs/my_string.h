@@ -26,9 +26,8 @@ void string_resize(string* str){
 
 size_t define_capacity(size_t n){
     size_t iter = 1;
-    while (iter < n)
-    {
-        iter *= 2;
+    while (iter < n) {
+        iter <<= 1;
     }
     return iter;
 }

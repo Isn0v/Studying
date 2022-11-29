@@ -12,10 +12,12 @@ def deprecated(func=None, since='', will_be_removed=''):
         if since:
             st_default += f" since version {since}"
 
+        st_default += ". It will be removed in "
+
         if will_be_removed:
-            st_default += f". It will be removed in version {will_be_removed}."
+            st_default += f"version {will_be_removed}."
         else:
-            st_default += f". It will be removed in future versions."
+            st_default += f"future versions."
 
         print(st_default)
         func(*args, **kwargs)

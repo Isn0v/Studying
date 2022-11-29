@@ -3,16 +3,18 @@
 #include "funcs.h"
 
 int main(int argc, char** argv){
-    string_array* str_arr;
-    str_arr = string_array_init(
-        0
-    );
+    // string_array* str_arr;
+    // str_arr = string_array_init(
+    //     0
+    // );
 
-    string* str = string_init("hbsdvhvb dnsnv\njdsjbv, 943ybvd");
-    str_arr = split(str);
+    // string* str = string_init("hbsdvhvb dnsnv\njdsjbv, 943ybvd");
+    // str_arr = split(str);
 
-    print_string_array(str_arr);
-    
+    // print_string_array(str_arr);
+
+    null_check(NULL);
+    scanf("%d");
 
 
     return 0;
