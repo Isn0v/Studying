@@ -3,19 +3,16 @@
 #include "funcs.h"
 
 int main(int argc, char** argv){
-    // string_array* str_arr;
-    // str_arr = string_array_init(
-    //     0
-    // );
+    
 
-    // string* str = string_init("hbsdvhvb dnsnv\njdsjbv, 943ybvd");
-    // str_arr = split(str);
-
-    // print_string_array(str_arr);
-
-    null_check(NULL);
-    scanf("%d");
-
-
+    FILE* file = fopen("test.txt", "r");
+    string* str = read(file);
+    string_array* lines = split(str, "\n");
+    string_array** words = (string_array**)malloc(sizeof(string_array*)*(lines->size));
+    for(size_t i = 0; i < lines->size; i++){
+        words[i] = split(&lines[i], " ");
+        lines[i] = string_compile(words[i]);
+    }
+    print_string_array(lines);
     return 0;
 }
