@@ -85,6 +85,15 @@ string* char_remove(string* str, char ch){
     return string_init(buf);
 }
 
+string* char_insert(string* str, char ch, size_t pos){
+    char buf[str->size + 1];
+    strncpy(buf, str->string_array, pos);
+    buf[pos] = ch;
+    strncpy(buf + pos + 1, str->string_array + pos, str->size - pos);
+    free_string(str);
+    return string_init(buf);
+}
+
 void print_string(string* str){
     printf("Size: %u\nCapacity: %u\nChar_arr: %s\n", str->size, str->capacity, str->string_array);
 }

@@ -36,16 +36,21 @@ string* delete_brackets(string* str){
     return str;
 }
 
-//deleting ' ' after '(' and before ')'
+//making ' ' after '(' and before ')'
 string* brackets_normallize(string* str){
     int open_bracket_index = char_index(str, '(');
+    if (get_char(str, open_bracket_index + 1) == ' '){
+        open_bracket_index = -1;
+    }
     int close_bracket_index = char_index(str, ')');
 
-    if (open_bracket_index != -1 && get_char(str, open_bracket_index + 1) == ' '){
-        str = char_remove(str + open_bracket_index, ' ');
-    }
-    if (close_bracket_index != -1 && get_char(str, close_bracket_index + 1) == ' '){
-        str = char_remove(str + close_bracket_index, ' ');
+    while(1){
+        if (open_bracket_index != -1 && get_char(str, open_bracket_index + 1) != ' '){
+            str = char_insert(str, ' ', open_bracket_index + 1);
+        }
+        if (close_bracket_index != -1 && get_char(str, close_bracket_index + 1) != ' '){
+            str = char_insert(str, ' ', close_bracket_index - 1);
+        }
     }
     return str;
 }
@@ -54,17 +59,19 @@ string* brackets_normallize(string* str){
 string_array* split(string* str, const char* delim){
     string_array* str_arr = string_array_init(0);
 
-    for(size_t i = 0; i < str->size - 2; i++){
-        //normallization of numbers of new lines
-        if (get_char(str, i) == '\n' && get_char(str, i + 1) == '\n' && get_char(str, i + 2) != '\n'){
-            char res_buf[str->size + 1];
+    //normallization of numbers of new lines
+    if(str->size >= 3){
+        for(size_t i = 0; i < str->size - 2; i++){
+            if (get_char(str, i) == '\n' && get_char(str, i + 1) == '\n' && get_char(str, i + 2) != '\n'){
+                char res_buf[str->size + 1];
 
-            strncpy(res_buf, str->string_array, i + 1);
-            res_buf[i + 1] = ' ';
-            strncpy(res_buf + i + 2, str->string_array + i + 1, str->size - i);
-            res_buf[str->size] = '\0';
+                strncpy(res_buf, str->string_array, i + 1);
+                res_buf[i + 1] = ' ';
+                strncpy(res_buf + i + 2, str->string_array + i + 1, str->size - i);
+                res_buf[str->size] = '\0';
 
-            str = string_init(res_buf);
+                str = string_init(res_buf);
+            }
         }
     }
     str = brackets_normallize(str);
@@ -77,28 +84,33 @@ string_array* split(string* str, const char* delim){
     return str_arr;
 }
 
-string* fars_to_cels(string* cels){
-    if (cels->size > 3 && cels->size <= 10 && (get_char(cels, 0) == '+' || get_char(cels, 0) == '-')
-    && get_char(cels, cels->size - 2) == 't' && get_char(cels, cels->size - 1) == 'F'){
-        for (size_t i = 1; i < cels->size - 2; i++){
-            if (!isdigit(get_char(cels, i))){
-                return cels;
+string* fars_to_cels(string* fareign){
+    if (fareign->size > 3 && fareign->size <= 10 && (get_char(fareign, 0) == '+' || get_char(fareign, 0) == '-')
+    && get_char(fareign, fareign->size - 2) == 't' && get_char(fareign, fareign->size - 1) == 'F'){
+        for (size_t i = 1; i < fareign->size - 2; i++){
+            if (!isdigit(get_char(fareign, i))){
+                return fareign;
             }
         }
 
-        size_t num_rank = cels->size - 3;
-        double celsium = 0; 
-        for (size_t i = 1; i < cels->size - 2; i++){
-            celsium += (get_char(cels, i) - 48) * degree(10, num_rank - i);
+        size_t num_rank = fareign->size - 3;
+        double fars = 0; 
+        for (size_t i = 1; i < fareign->size - 2; i++){
+            fars += (get_char(fareign, i) - 48) * degree(10, num_rank - i);
         }
-        double fareings = 5 * (celsium - 32) / 9;
-        char fars[10];
-        if ()
-        sprintf(fars, "%.1ftC", fareings);
-        free_string(cels);
-        return string_init(fars);
+        double celsiums = 5 * (fars - 32) / 9;
+        char cels[10];
+
+        if (celsiums < 0){
+            sprintf(cels, "-%.1ftC", celsiums);
+        } else {
+            sprintf(cels, "%.1ftC", celsiums);
+        }
+        
+        free_string(fareign);
+        return string_init(cels);
     } else {
-        return cels;
+        return fareign;
     }
 }
 

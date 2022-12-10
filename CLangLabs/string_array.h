@@ -37,6 +37,7 @@ string_array* string_array_init(size_t n, ...){
     return str_arr;
 }
 
+
 void string_array_resize(string_array* str_arr){
     str_arr->capacity *= 2;
     str_arr->string_ptr = (string*)realloc(str_arr->string_ptr, str_arr->capacity*sizeof(string));
