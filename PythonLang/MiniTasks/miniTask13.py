@@ -1,7 +1,6 @@
 def chain(*iters):
     for it in iters:
-        for val in it:
-            yield val
+        yield from it
 
 if __name__ == '__main__':
     lst = [342, 456, 7]

@@ -1,10 +1,12 @@
 class Singleton:
-    __created = None
+    instance = None
 
-    def __new__(cls):
-        if not hasattr(cls, 'instance'):
-            cls.instance = super(Singleton, cls).__new__(cls)
-        return cls.instance
+    def __new__(cls, *args, **kwargs):
+        if not Singleton.instance:
+            Singleton.instance = super(Singleton, cls).__new__(cls)
+        else:
+            cls.__init__ = lambda *args, **kwargs: None
+        return Singleton.instance
 
 
 class Counter:
@@ -17,12 +19,15 @@ class Counter:
 
 class GlobalCounter(Singleton, Counter):
     def __init__(self, count=0) -> None:
-        Singleton.__init__(self)
-        Counter.__init__(self, count)
+        self.count = count
+        Singleton.__init__(Counter)
+        print("init")
+            
 
 
 if __name__ == '__main__':
     gc1 = GlobalCounter()
-    gc2 = GlobalCounter()
-    #gc2 = GlobalCounter(5) - ошибку выдает, надо обсудить
+    #gc2 = GlobalCounter()
+    gc2 = GlobalCounter(5)
+    print(gc2.count)
     print(id(gc1) == id(gc2))

@@ -1,7 +1,6 @@
 def cycle(cls):
     while True:
-        for val in cls:
-            yield val
+        yield from cls
 
 def take(it, stop_pos):
     lst = [] # не особо понял, какой здесь тип должен быть
