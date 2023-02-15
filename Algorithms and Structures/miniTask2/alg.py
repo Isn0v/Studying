@@ -1,39 +1,30 @@
-def extend_num_string(num, stop_val):
-    res_val = ""
-    for i in range(len(num), stop_val):
-        res_val += "0"
-    return res_val + str(num)
-
-
-def normallize(a_str, b_str):
-    max_len = max(len(a_str), len(b_str))
-
-    if max_len == 1:
-        return a_str, b_str
-
-    if max_len % 2:
-        max_len += 1
-
-
-    if len(a_str) < max_len:
-        a_str = extend_num_string(a_str, max_len)
-    if len(b_str) < max_len:
-        b_str = extend_num_string(b_str, max_len)
-    return a_str, b_str
-
-
-def run_alg(a_str, b_str):
-    if len(a_str) == 1 and len(b_str) == 1:
-        return int(a_str) * int(b_str)
+def half_slice(num):
+    l = int_len(num) 
+    if l % 2:
+        l = (l // 2) + 1
     else:
-        a_str, b_str = normallize(a_str, b_str)
+        l //= 2
+    return num // (10 ** l), num % (10 ** l)
 
-        a = a_str[:len(a_str) // 2]
-        b = a_str[len(a_str) // 2:]
-        c = b_str[:len(b_str) // 2]
-        d = b_str[len(b_str) // 2:]
+def int_len(num):
+    if num == 0:
+        return 1
+    count = 0
+    while num != 0:
+        count += 1
+        num //= 10
+    return count
 
-        a_b, c_d = normallize(str(int(a) + int(b)), str(int(c) + int(d)))
+def run_alg(num, delim):
+    if int_len(num) == 1 and int_len(delim) == 1:
+        return num * delim
+    else:
+
+        a, b = half_slice(num)
+        c, d = half_slice(delim)
+
+        a_b = a + b
+        c_d = c + d
 
         a_c = run_alg(a, c)
         b_d = run_alg(b, d)
@@ -42,12 +33,18 @@ def run_alg(a_str, b_str):
 
         sub_res = ab_cd - a_c - b_d
 
-        a_c *= 10**len(a_str)
-        sub_res *= 10**(len(a_str) // 2)
+        l = max(int_len(num), int_len(delim))
+        h_l = l // 2
+
+        if l % 2:
+            l += 1
+            h_l += 1
+
+        a_c *= 10**l
+        sub_res *= 10**(h_l)
         return a_c + b_d + sub_res
 
 if __name__ == "__main__":
-    a, b = input().split()
-    a, b = normallize(a, b)
+    a, b = map(int, input().split())
 
     print(run_alg(a, b))  
