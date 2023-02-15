@@ -18,4 +18,4 @@ def search(nums, target):
 
 
 lst = [1,42,8,9,14,188,19,65]
-print(search(lst, 20))
+print(search(lst))
