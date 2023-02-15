@@ -17,5 +17,5 @@ def search(nums, target):
     return res_ind
 
 
-lst = [1,42,8,9,14,188,19,65]
+lst = [1,4,82,9,143,18,19,6]
 print(search(lst))
