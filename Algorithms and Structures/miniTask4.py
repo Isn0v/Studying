@@ -3,25 +3,23 @@ import shlex
 
 import os
 
-def command(hash):
+def command_miniTask(hash):
     checkout(hash)
 
     filename = "miniTask3.py"
     filepath = "Algorithms and Structures"
 
-    cmd = f"python {filepath}/{filename}"
-    args = shlex.split(cmd)
+    args = ["python", f"{filepath}/{filename}"]
 
-    p = subprocess.Popen(args, stderr=subprocess.PIPE)
-    stderr = p.communicate()[1].decode(encoding="utf-8")
-    if not stderr:
+    try:
+        p = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+    except Exception:
         return 1
-    else:
-        return 0
+    return 0
 
 def search(commits, command):
     left = 0
-    right = len(commits)
+    right = len(commits) - 1
     res_ind = -1
     it_ind = right // 2
     error_code = command(commits[it_ind])
@@ -31,13 +29,13 @@ def search(commits, command):
             break
 
         if error_code != 0:
-            if command(commits[it_ind + 1] == 0):
+            if it_ind == len(commits) - 1 or command(commits[it_ind + 1]) == 0:
                 res_ind = it_ind
                 break
             left = it_ind
 
         elif error_code == 0:
-            if command(commits[it_ind - 1] != 0):
+            if it_ind == 0 or command(commits[it_ind - 1]) != 0:
                 res_ind = it_ind
                 break
             right = it_ind
@@ -51,7 +49,7 @@ def checkout(hash):
     cmd = f'git checkout {hash}'
     args = shlex.split(cmd)
 
-    subprocess.Popen(args)
+    subprocess.Popen(args, stdout=subprocess.PIPE)
 
 def git_log(start_hash, end_hash):
     cmd = f'git log {start_hash}..{end_hash}'
@@ -63,7 +61,7 @@ def git_log(start_hash, end_hash):
     out_list = [i.decode(encoding="utf-8") for i in out_list]
     out_list = [''.join(out_list[i:i+6]) for i in range(0, len(out_list), 6)]
 
-    return out_list[::-1]
+    return out_list
 
 
 def bisect(rep_path, start_hash, end_hash, command):
@@ -84,5 +82,14 @@ def bisect(rep_path, start_hash, end_hash, command):
 
 if __name__ == "__main__":
     rep_path = "D:/Documents/Coding/Visual Studio Code Projects/Studying"
-    
 
+    start_hash = "cd1ac44bca84436ae78d5a0bee0fc9e1c1511b8a"
+    end_hash = "54fddbdf940e42b362b1fd9b6f4862301516add2"
+
+    command = command_miniTask
+
+    bad_commit = bisect(rep_path, start_hash, end_hash, command)
+
+    checkout("54fddbdf940e42b362b1fd9b6f4862301516add2")
+
+    print(bad_commit)
