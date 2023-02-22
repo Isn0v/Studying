@@ -29,14 +29,13 @@ def search(commits, command):
             break
 
         if error_code != 0:
-            if it_ind == len(commits) - 1 or command(commits[it_ind + 1]) == 0:
+            if it_ind == len(commits) - 1:
                 res_ind = it_ind
                 break
             left = it_ind
 
         elif error_code == 0:
-            if it_ind == 0 or command(commits[it_ind - 1]) != 0:
-                res_ind = it_ind
+            if it_ind == 0:
                 break
             right = it_ind
         it_ind = (left + right) // 2
