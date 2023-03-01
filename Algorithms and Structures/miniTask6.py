@@ -7,7 +7,7 @@ def wiggleSort(nums: list[int]):
     
     for i in range(len(nums)):
         if i % 2:
-            nums[i] =  nums2[i // 2]
+            nums[i] = nums2[i // 2]
         else:
             nums[i] = nums1[i // 2 + i % 2]
 
