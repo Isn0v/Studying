@@ -1,5 +1,8 @@
+import math
+
 def shell_sort(lst: list):
-    step = len(lst) // 2
+    st = int(math.log(len(lst), 2))
+    step = 2**st - 1
     while step > 0:
         for i in range(step, len(lst)):
             j = i
@@ -8,7 +11,8 @@ def shell_sort(lst: list):
                 lst[start_subseq], lst[j] = lst[j], lst[start_subseq]
                 j = start_subseq
                 start_subseq = j - step
-        step //= 2
+        st -= 1
+        step = 2**st - 1
     return lst
 
 def h_index(lst):
@@ -23,5 +27,5 @@ def h_index(lst):
             
 
 if __name__ == "__main__":
-    lst = [1, 2]
-    print(h_index(lst))
+    lst = [1, 2, 24, 546, 234, 6, 4]
+    print(shell_sort(lst))
