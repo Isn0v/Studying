@@ -15,11 +15,19 @@ def sub_matrixes(matr):
         return a, b, c, d
     
 def change_len(matr):
+    def find_degree(num): #degree of 2 higher then given num
+        res = 1
+        while True:
+            if 2**res > num:
+                return 2**res
+            res += 1 
+
+
     m_old = len(matr)
     n_old = len(matr[0])
 
-    m = m_old + len(matr) % 2
-    n = n_old + len(matr[0]) % 2
+    m = find_degree(m_old)
+    n = find_degree(n_old)
 
     max_len = max(m, n)
 
