@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdlib>
+#include <assert.h>
 
 typedef int vector_value_t;
 
@@ -9,7 +10,7 @@ private:
     std::size_t size;
     vector_value_t* array;
 
-    static std::size_t get_capacity(std::size_t value){
+    static std::size_t update_capacity(std::size_t value){
         std::size_t capacity = 1;
         while (capacity <= value){
             capacity *= 2;
@@ -17,21 +18,27 @@ private:
         return capacity;
     }
 
-    void resize_array(bool upgrade = true){
-        if (upgrade){
+    void resize_array(bool expand = true){
+        if (expand){
             this->capacity *= 2;
         } else {
             this->capacity /= 2;
         }
 
         this->array = (vector_value_t*) realloc(this->array, sizeof(vector_value_t)*this->capacity);
+        if (this->array == nullptr){
+            throw std::runtime_error("Invalid allocation");
+        }
     }
 
 public:
     explicit Vector(std::size_t size = 0){
-        this->capacity = get_capacity(size);
+        this->capacity = update_capacity(size);
         this->size = size;
-        this->array = new vector_value_t(capacity);
+        this->array = (vector_value_t*) malloc(sizeof(vector_value_t) * (capacity));
+        if (this->array == nullptr){
+            throw std::runtime_error("Invalid allocation");
+        }
     }
 
     void push_back(vector_value_t value){
@@ -44,7 +51,7 @@ public:
 
     vector_value_t get_value(std::size_t index){
         if (index >= size){
-            throw std::string("Index out of range!");
+            throw std::runtime_error("Index out of range!");
         }
         return array[index];
     }
@@ -59,7 +66,7 @@ public:
     }
 
     ~Vector(){
-        delete array;
+        free(array);
     }
 };
 

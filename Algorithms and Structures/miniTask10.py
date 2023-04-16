@@ -1,6 +1,10 @@
 def lsd_radix(arr):
+    ASCII_MAX = 128
+    
+    assert(all(ord(c) < ASCII_MAX for c in arr))
+    
     def sort_by_digit(digit):
-        buffer = [0 for i in range(128)] #assume there are only ascii symbs
+        buffer = [0 for i in range(ASCII_MAX)] #assume there are only ascii symbs
         
         for i in range(len(arr)):
             buffer[ord(arr[i][-digit])] += 1
