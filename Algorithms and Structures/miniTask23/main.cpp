@@ -11,25 +11,31 @@ struct TreeNode {
     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 };
 
-void traversal(TreeNode* cur_node, std::vector<int>& vals){
+
+void traversal(TreeNode* cur_node, std::vector<int>& vals, bool& is_bst){
     if(cur_node == nullptr){
         return;
     }
 
-    traversal(cur_node->left, vals);
-    vals.push_back(cur_node->val);
-    traversal(cur_node->right, vals);
+    traversal(cur_node->left, vals, is_bst);
+    if(vals.empty()){
+        vals.push_back(cur_node->val);
+    } else {
+        if(vals[vals.size() - 1] >= cur_node->val){
+            is_bst = false;
+        }
+
+        vals.push_back(cur_node->val);
+    }
+
+    traversal(cur_node->right, vals, is_bst);
 }
 
 bool isValidBST(TreeNode* root) {
     std::vector<int> vals;
+    bool is_bst = true;
 
-    traversal(root, vals);
+    traversal(root, vals, is_bst);
 
-    for(int i = 1; i < vals.size(); i++){
-           if (vals[i - 1] > vals[i] || std::count(vals.begin(), vals.end(), vals[i - 1]) > 1){
-               return false;
-           }
-    }
-    return true;
+    return is_bst;
 }
