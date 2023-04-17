@@ -20,7 +20,7 @@ std::map<std::string, int> priority_map = {
         {"||", 12}
 };
 
-std::string sorting_operators(std::stack<std::string>& operator_tokens, std::string cur_operator){
+std::string sorting_operators(std::stack<std::string>& operator_tokens, const std::string& cur_operator, std::string& polska_string){
     std::string ret_op = "";
 
     if (operator_tokens.empty()){
@@ -48,9 +48,10 @@ std::string sorting_operators(std::stack<std::string>& operator_tokens, std::str
                     throw std::string("Invalid formula: open bracket missed");
                 }
 
-                ret_op += operator_tokens.top();
+                polska_string += operator_tokens.top() + " ";
                 operator_tokens.pop();
             }
+            operator_tokens.pop();
         } else {
             operator_tokens.push(cur_operator);
         }
@@ -59,7 +60,16 @@ std::string sorting_operators(std::stack<std::string>& operator_tokens, std::str
     return ret_op;
 }
 
+bool is_operator(const std::string& cur_operator){
+    if (priority_map[cur_operator] == 0){
+        return false;
+    } else {
+        return true;
+    }
+}
+
 int main() {
+
     std::cout << "Formula: ";
     std::string formula;
     std::cin >> formula;
@@ -68,20 +78,37 @@ int main() {
     auto operator_tokens = new std::stack<std::string>();
     std::string polska_string = "";
     std::string cur_operator = "";
+    std::string cur_digit = "";
 
-    for(std::size_t i = 0; i < formula.size(); i++){
+    for(std::size_t i = 0; i < formula.size() - 1; i++){
+        if (formula[i] == ' '){
+            continue;
+        }
+
         if (std::isdigit(formula[i])){
-            polska_string += formula[i];
+            cur_digit += formula[i];
         } else {
             // need adding some features to support unary operations
+            polska_string += cur_digit + " ";
+            cur_digit = "";
+
             cur_operator += formula[i];
-            if (std::isdigit(formula[i + 1])){
-                cur_operator = sorting_operators(*operator_tokens, cur_operator);
+            if (!std::isdigit(formula[i + 1])){
+
+                if (is_operator(cur_operator) && !is_operator(cur_operator + formula[i + 1])){
+                    cur_operator = sorting_operators(*operator_tokens, cur_operator, polska_string);
+                }
+            } else {
+                if (is_operator(cur_operator)){
+                    cur_operator = sorting_operators(*operator_tokens, cur_operator, polska_string);
+                }
+
                 if(cur_operator != ""){
                     polska_string += cur_operator;
                 }
             }
         }
+
     }
 
     while (!operator_tokens->empty()){
@@ -91,4 +118,5 @@ int main() {
 
     delete operator_tokens;
     std::cout << polska_string;
+
 }
