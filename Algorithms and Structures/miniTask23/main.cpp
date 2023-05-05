@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <limits>
 
 struct TreeNode {
     int val;
@@ -12,30 +13,20 @@ struct TreeNode {
 };
 
 
-void traversal(TreeNode* cur_node, std::vector<int>& vals, bool& is_bst){
-    if(cur_node == nullptr){
-        return;
+bool valid_traversal(TreeNode* cur_node, long min, long max){
+    if (cur_node == nullptr){
+        return true;
     }
 
-    traversal(cur_node->left, vals, is_bst);
-    if(vals.empty()){
-        vals.push_back(cur_node->val);
-    } else {
-        if(vals[vals.size() - 1] >= cur_node->val){
-            is_bst = false;
-        }
-
-        vals.push_back(cur_node->val);
+    if (cur_node->val <= min || cur_node->val >= max){
+        return false;
     }
 
-    traversal(cur_node->right, vals, is_bst);
+    bool left_check = valid_traversal(cur_node->left, min, cur_node->val);
+    bool right_check = valid_traversal(cur_node->right, cur_node->val, max);
+    return left_check && right_check;
 }
 
 bool isValidBST(TreeNode* root) {
-    std::vector<int> vals;
-    bool is_bst = true;
-
-    traversal(root, vals, is_bst);
-
-    return is_bst;
+    return valid_traversal(root, std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
 }
