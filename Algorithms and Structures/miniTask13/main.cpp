@@ -1,12 +1,13 @@
 #include <iostream>
 #include <assert.h>
-#include <vector>
+#include <chrono>
+#include <random>
 
 
-void swap(long* i, long* j) {
-    long tmp = *i;
-    *i = *j;
-    *j = tmp;
+void swap(long& i, long& i1) {
+    auto tmp = i;
+    i = i1;
+    i1 = tmp;
 }
 
 long* hoare_partition(long* first, long* last) {
@@ -15,15 +16,15 @@ long* hoare_partition(long* first, long* last) {
         return first; // nothing interesting to do
     --last;
     if (*first > *last)
-        swap(first, last);
-    long* pivot_pos = first;
-    long pivot = *pivot_pos;
+        swap(*first, *last);
+    auto pivot_pos = first;
+    auto pivot = *pivot_pos;
     for (;;) {
         ++first;
-        long f = *first;
+        auto f = *first;
         while (f < pivot)
             f = *++first;
-        long l = *last;
+        auto l = *last;
         while (pivot < l)
             l = *--last;
         if (first >= last)
@@ -33,40 +34,7 @@ long* hoare_partition(long* first, long* last) {
         --last;
     }
     --first;
-    swap(first, pivot_pos);
-    return first;
-}
-
-long* lomuto_partition(long* first, long* last) {
-    assert(first <= last);
-    if (last - first < 2)
-        return first; // nothing interesting to do
-    --last;
-    if (*first > *last)
-        swap(first, last);
-    long* pivot_pos = first;
-    long pivot = *first;
-    // Prelude: position first (the write head) on the first element
-    // larger than the pivot.
-    do {
-        ++first;
-    } while (*first < pivot);
-    assert(first <= last);
-    // Main course.
-    for (long* read = first + 1; read < last; ++read) {
-        // long x = *read;
-        if (*read < pivot) {
-            // *read = *first;
-            // *first = x;
-            swap(read, first);
-            ++first;
-        }
-    }
-    // Put the pivot where it belongs.
-    assert(*first >= pivot);
-    --first;
-    *pivot_pos = *first;
-    *first = pivot;
+    swap(*first, *pivot_pos);
     return first;
 }
 
@@ -76,19 +44,19 @@ long* lomuto_partition_branchfree(long* first, long* last) {
         return first; // nothing interesting to do
     --last;
     if (*first > *last)
-        swap(first, last);
-    long* pivot_pos = first;
-    long pivot = *first;
+        swap(*first, *last);
+    auto pivot_pos = first;
+    auto pivot = *first;
     do {
         ++first;
         assert(first <= last);
     } while (*first < pivot);
-    for (long* read = first + 1; read < last; ++read) {
-        long  long x = *read;
-        long long smaller = -(long long)(x < pivot);
-        long long delta = smaller & (read - first);
+    for (auto read = first + 1; read < last; ++read) {
+        auto x = *read;
+        auto smaller = -int(x < pivot);
+        auto delta = smaller & (read - first);
         first[delta] = *first;
-        read[-delta] = (long)x;
+        read[-delta] = x;
         first -= smaller;
     }
     assert(*first >= pivot);
@@ -98,87 +66,27 @@ long* lomuto_partition_branchfree(long* first, long* last) {
     return first;
 }
 
-void quickSortLomuto(long* low, long* high) {
-    if (low < high) {
-        long* pi = lomuto_partition( low, high);
-        quickSortLomuto(low, pi - 1);
-        quickSortLomuto( pi + 1, high);
-    }
-}
-
-void quickSortHoare(long* low, long* high) {
-    if (low < high) {
-        long* pi = hoare_partition( low, high);
-        quickSortLomuto(low, pi - 1);
-        quickSortLomuto( pi + 1, high);
-    }
-}
-
-void quickSortLomutoBranchFree(long* low, long* high){
-    if (low < high) {
-        long* pi = lomuto_partition_branchfree( low, high);
-        quickSortLomuto(low, pi);
-        quickSortLomuto( pi + 1, high);
-    }
-}
-
-void printArray(long arr[], int size) {
-    int i;
-    for (i = 0; i < size; i++)
-        std::cout << arr[i];
-    std::cout << std::endl;
-}
-
-void arrCopy(long* arr1, size_t size, long* arr2) {
-    for (size_t i = 0; i <= size; i++) {
-        arr2[i] = arr1[i];
-    }
-}
 
 
-
-
-int main(){
-    for (size_t i = 1000000; i <= 10000000; i = i + 1000) {
-        printf("%zu", i);
-        printf("%c", '\n');
-        long* arr = new long(i);
-        for (size_t j = 0; j <= i; j++){
-            arr[j] = rand() % 200;
-        }
-//        printArray(arr, i);
-//        printf("%c", '\n');
-        long* arrCpy = new long(i);
-        arrCopy(arr, i, arrCpy);
-        clock_t start1 = clock();
-        quickSortHoare(arrCpy, arrCpy + i);
-        clock_t end1 = clock();
-//        printArray(arrCpy, i);
-//        printf("%c", '\n');
-        float hoareTime = end1 - start1;
-        clock_t start2 = clock();
-        arrCopy(arr, i, arrCpy);
-        quickSortLomuto(arrCpy, arrCpy + i);
-//        printf("%c", '\n');
-//        printArray(arrCpy, i);
-//        printf("%c", '\n');
-        clock_t end2 = clock();
-        float lomutoTime = end2 - start2;
-        clock_t start3 = clock();
-        quickSortLomutoBranchFree(arr, arr + i);
-        clock_t end3 = clock();
-        float lomutoBFTime = end3 - start3;
-        printf("%.100f", hoareTime);
-        printf("%c", '\n');
-        printf("%.100f", lomutoTime);
-        printf("%c", '\n');
-        printf("%.100f", lomutoBFTime);
-        printf("%c", '\n');
-        printf("%c", '\n');
-        delete(arr);
-        delete(arrCpy);
+int main() {
+    int len = 1000000000;
+    srand(time(0));
+    long* arr1 = new long[len];
+    long* arr2 = new long[len];
+    for(int i = 0; i < len; i++){
+        arr1[i] = arr2[i] = rand() % 200 - 100;
     }
 
+    auto start = std::chrono::steady_clock::now();
+    arr1 = hoare_partition(arr1, arr1 + len);
+    auto end = std::chrono::steady_clock::now();
+    std::chrono::duration<double> delta1 = end - start;
 
+    start = std::chrono::steady_clock::now();
+    arr2 = lomuto_partition_branchfree(arr2, arr2 + len);
+    end = std::chrono::steady_clock::now();
+    std::chrono::duration<double> delta2 = end - start;
 
+    std::cout << "Hoare partition time: " << delta1.count() << "\n";
+    std::cout << "Lomuto branch-free partition time: " << delta2.count() << "\n";
 }
