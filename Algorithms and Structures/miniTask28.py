@@ -37,7 +37,7 @@ def configure_bitset(requests, error_possibility):
     while not prime(n):
         n += 1
 
-    k = int(math.log(2) * b)
+    k = math.ceil(math.log(2) * b)
     return n, k
 
 
@@ -67,15 +67,15 @@ class Bloom_Filter:
 
  
 if __name__ == "__main__":
-    S = 100
-    err = 0.3
+    S = 10
+    err = 0.000001
     
     n, k = configure_bitset(S, err)
     
     hash_funcs = [get_hash_func(n) for i in range(k)]
     bloom_filter = Bloom_Filter(n, hash_funcs)
     
-    ips = [[random.randint(0, 255) for i in range(4)] for j in range(100)]
+    ips = [[random.randint(0, 255) for i in range(4)] for j in range(S)]
     
     for ip in ips:
         bloom_filter.append(ip)
