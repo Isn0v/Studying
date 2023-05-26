@@ -67,8 +67,8 @@ class Bloom_Filter:
 
  
 if __name__ == "__main__":
-    S = 10
-    err = 0.000001
+    S = 100
+    err = 0.5
     
     n, k = configure_bitset(S, err)
     

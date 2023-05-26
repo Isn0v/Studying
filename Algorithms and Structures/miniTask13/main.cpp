@@ -10,6 +10,24 @@ void swap(long& i, long& i1) {
     i1 = tmp;
 }
 
+long* lomuto_partition_naive(long* first, long* last) {
+    assert(first <= last);
+    if (last - first < 2)
+        return first; // nothing interesting to do
+    auto pivot_pos = first;
+    auto pivot = *first;
+    ++first;
+    for (auto read = first; read < last; ++read) {
+        if (*read < pivot) {
+            swap(*read, *first);
+            ++first;
+        }
+    }
+    --first;
+    swap(*first, *pivot_pos);
+    return first;
+}
+
 long* hoare_partition(long* first, long* last) {
     assert(first <= last);
     if (last - first < 2)
@@ -73,6 +91,7 @@ int main() {
     srand(time(0));
     long* arr1 = new long[len];
     long* arr2 = new long[len];
+    long* arr3 = new long[len];
     for(int i = 0; i < len; i++){
         arr1[i] = arr2[i] = rand() % 200 - 100;
     }
@@ -87,6 +106,13 @@ int main() {
     end = std::chrono::steady_clock::now();
     std::chrono::duration<double> delta2 = end - start;
 
-    std::cout << "Hoare partition time: " << delta1.count() << "\n";
-    std::cout << "Lomuto branch-free partition time: " << delta2.count() << "\n";
+    start = std::chrono::steady_clock::now();
+    arr3 = lomuto_partition_naive(arr3, arr3 + len);
+    end = std::chrono::steady_clock::now();
+    std::chrono::duration<double> delta3 = end - start;
+
+    std::cout << "How much time one slower than another: " << std::endl;
+    std::cout << "Hoare partition time \\ Lomuto branch-free partition time : " << delta1 / delta2 * 100 << "\n";
+    std::cout << "Hoare partition time \\ Lomuto partition naive time, %: " << delta1 / delta3 * 100 << "\n";
+    std::cout << "Lomuto branch-free partition time \\ Lomuto partition naive time, %: " << delta2 / delta3 * 100 << "\n";
 }
