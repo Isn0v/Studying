@@ -5,6 +5,8 @@
 #include <stack>
 #include <cctype>
 
+using namespace std;
+
 std::map<std::string, int> priority_map = {
         {"(", 1}, {")", 1},
         {"!", 2}, {"-", 2}, {"~", 2},
@@ -20,103 +22,99 @@ std::map<std::string, int> priority_map = {
         {"||", 12}
 };
 
-std::string sorting_operators(std::stack<std::string>& operator_tokens, const std::string& cur_operator, std::string& polska_string){
-    std::string ret_op = "";
-
-    if (operator_tokens.empty()){
-        operator_tokens.push(cur_operator);
-    } else {
-        int cur_priority = priority_map[cur_operator];
-        if (cur_priority == 0){
-            throw std::string("No such operator: ") + cur_operator;
-        }
-
-        int latest_priority = priority_map[operator_tokens.top()];
-        if (latest_priority == 0){
-            throw std::string("No such operator: ") + operator_tokens.top();
-        }
-
-        //need some improvements about left associations
-        if (latest_priority < cur_priority){
-            ret_op = operator_tokens.top();
-            operator_tokens.pop();
-
-            operator_tokens.push(cur_operator);
-        } else if (cur_operator == ")"){
-            while (operator_tokens.top() != "("){
-                if (operator_tokens.empty()){
-                    throw std::string("Invalid formula: open bracket missed");
-                }
-
-                polska_string += operator_tokens.top() + " ";
-                operator_tokens.pop();
-            }
-            operator_tokens.pop();
-        } else {
-            operator_tokens.push(cur_operator);
-        }
-    }
-
-    return ret_op;
-}
-
-bool is_operator(const std::string& cur_operator){
-    if (priority_map[cur_operator] == 0){
+bool is_operator(const string& elem){
+    if (priority_map[elem] == 0){
         return false;
     } else {
         return true;
     }
 }
 
+bool is_digit(string str){
+    return isdigit(str[0]);
+}
+
+//1 - part of number
+//2 - part of operator
+//3 - anything else
+int get_symbol_type(const char token){
+    if (isdigit(token)){
+        return 1;
+    } else if (is_operator(to_string(token))){
+        return 2;
+    } else {
+        return 3;
+    }
+}
+
+vector<string> parse_expression_to_list(string& expression){
+    vector<string> parsed{};
+
+    string lexema(1, expression[0]);
+
+    for(int i = 1; i < expression.size(); i++){
+        int token_type = get_symbol_type(expression[i]);
+
+        if (token_type == 1 && token_type == get_symbol_type(lexema[lexema.size() - 1]) ||
+        token_type == 2 && token_type == get_symbol_type(lexema[lexema.size() - 1]) && is_operator(lexema + to_string(expression[i]))){
+            lexema.push_back(expression[i]);
+
+        } else {
+            parsed.push_back(lexema);
+            lexema = string(1, expression[i]);
+        }
+    }
+    parsed.push_back(lexema);
+    return parsed;
+}
+
 int main() {
 
-    std::cout << "Formula: ";
-    std::string formula;
-    std::cin >> formula;
+    cout << "Formula: ";
+    string formula;
+    cin >> formula;
 
-    //need cleaning
-    auto operator_tokens = new std::stack<std::string>();
-    std::string polska_string = "";
-    std::string cur_operator = "";
-    std::string cur_digit = "";
+    auto parsed = parse_expression_to_list(formula);
 
-    for(std::size_t i = 0; i < formula.size() - 1; i++){
-        if (formula[i] == ' '){
-            continue;
-        }
+    stack<string> operator_stack{};
+    vector<string> polska_list{};
 
-        if (std::isdigit(formula[i])){
-            cur_digit += formula[i];
-        } else {
-            // need adding some features to support unary operations
-            polska_string += cur_digit + " ";
-            cur_digit = "";
-
-            cur_operator += formula[i];
-            if (!std::isdigit(formula[i + 1])){
-
-                if (is_operator(cur_operator) && !is_operator(cur_operator + formula[i + 1])){
-                    cur_operator = sorting_operators(*operator_tokens, cur_operator, polska_string);
-                }
+    for (auto elem: parsed){
+        if (is_digit(elem)){
+            polska_list.push_back(elem);
+        } else if (is_operator(elem)){
+            if (operator_stack.empty()){
+                operator_stack.push(elem);
             } else {
-                if (is_operator(cur_operator)){
-                    cur_operator = sorting_operators(*operator_tokens, cur_operator, polska_string);
-                }
+                int cur_priority = priority_map[elem];
+                int latest_priority = priority_map[operator_stack.top()];
 
-                if(cur_operator != ""){
-                    polska_string += cur_operator;
+                if (latest_priority < cur_priority && latest_priority != 1){
+                    polska_list.push_back(operator_stack.top());
+                    operator_stack.pop();
+
+                    operator_stack.push(elem);
+                } else if (elem == ")"){
+                    while (operator_stack.top() != "("){
+
+                        polska_list.push_back(operator_stack.top());
+                        operator_stack.pop();
+                    }
+                    operator_stack.pop();
+                } else {
+                    operator_stack.push(elem);
                 }
             }
         }
-
     }
 
-    while (!operator_tokens->empty()){
-        polska_string += operator_tokens->top();
-        operator_tokens->pop();
+    while(!operator_stack.empty()){
+        polska_list.push_back(operator_stack.top());
+        operator_stack.pop();
     }
 
-    delete operator_tokens;
-    std::cout << polska_string;
-
+    cout << "Polska_list:\n";
+    for (auto elem: polska_list){
+        cout << elem << ' ';
+    }
 }
