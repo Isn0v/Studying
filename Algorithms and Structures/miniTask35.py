@@ -117,18 +117,18 @@ class Task:
     deadline = 0
     latency = 0
 
-    def __init__(self, dead, penalty):
+    def __init__(self, dead, latency):
         self.deadline = dead
-        self.latency = penalty
+        self.latency = latency
 
     def __eq__(self, other):
-        return self.latency == other.penalty
+        return self.latency == other.latency
 
     def __gt__(self, other):
-        return self.latency > other.penalty
+        return self.latency > other.latency
 
     def __lt__(self, other):
-        return self.latency < other.penalty
+        return self.latency < other.latency
 
 
 def set_task(deadline, parents):
