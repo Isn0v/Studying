@@ -65,3 +65,29 @@ def check_naive(array):
         if i <= task.deadline - 1:
             res_val += task.fine
     return res, res_val
+
+
+if __name__ == "__main__":
+    tasks = [Task("A", 1, 20), Task("B", 1, 20), Task("C", 1, 20), Task("D", 1, 20), Task("E", 1, 20), Task("F", 1, 20)]
+    tasks.sort(key=lambda x: x.fine, reverse=True)
+    res_smart = check_smart(tasks)
+    res_naive = check_naive(tasks)
+    print(res_smart, res_naive)
+    
+    tasks = [Task("A", 4, 80), Task("B", 4, 100), Task("C", 2, 90), Task("D", 1, 95), Task("E", 3, 40)]
+    tasks.sort(key=lambda x: x.fine, reverse=True)
+    res_smart = check_smart(tasks)
+    res_naive = check_naive(tasks)
+    print(res_smart, res_naive)
+
+    tasks = [Task("A", 5, 60), Task("B", 1, 10), Task("C", 1, 10), Task("D", 1, 10), Task("E", 1, 10), Task("F", 1, 10)]
+    tasks.sort(key=lambda x: x.fine, reverse=True)
+    res_smart = check_smart(tasks)
+    res_naive = check_naive(tasks)
+    print(res_smart, res_naive)
+
+    tasks = [Task("A", 3, 25), Task("B", 4, 10), Task("C", 1, 30), Task("D", 3, 50), Task("E", 3, 20)]
+    tasks.sort(key=lambda x: x.fine, reverse=True)
+    res_smart = check_smart(tasks)
+    res_naive = check_naive(tasks)
+    print(res_smart, res_naive)
