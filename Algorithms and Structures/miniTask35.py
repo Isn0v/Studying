@@ -8,7 +8,7 @@ class Task:
 class Node:
     def __init__(self, value):
         self.val = value
-        self.ret_val = value
+        self.left_border = value
         self.rank = 0
 
 
@@ -33,9 +33,10 @@ class UnionFind:
         if member_1 == member_2:
             return
 
+        self.data[member_1].left_border = self.data[member_2].left_border = min(self.data[member_1].left_border, self.data[member_2].left_border)
+        
         if self.data[member_1].rank > self.data[member_2].rank:
             self.data[member_2].val = member_1
-            self.data[member_1].ret_val = self.data[member_2].ret_val
         else: #member_2.rank <= member_1.rank
             self.data[member_1].val = member_2
             if self.data[member_1].rank == self.data[member_2].rank:
@@ -48,7 +49,7 @@ def check_smart(arr):
     res_val = 0
 
     for task in arr:
-        index = union_find.find(task.deadline - 1).ret_val
+        index = union_find.find(task.deadline - 1).left_border
         union_find.union(index, index - 1)
         res[index] = task.number
         if index <= task.deadline - 1:
@@ -56,11 +57,11 @@ def check_smart(arr):
     return res, res_val
 
 
-def check_naive(array):
+def check_naive(arr):
     res = []
     res_val = 0
-    for i in range(len(array)):
-        task = array[i]
+    for i in range(len(arr)):
+        task = arr[i]
         res.append(task.number)
         if i <= task.deadline - 1:
             res_val += task.fine
