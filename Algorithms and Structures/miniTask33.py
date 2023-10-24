@@ -9,3 +9,4 @@ def maxProfit(prices):
             profit += prices[i] - min_n
             min_n = prices[i]
     return profit
+    
