@@ -64,15 +64,35 @@ class ImplicitTreap:
         return total_sum
 
     def _get_sum(self, node):
-        return node.value if node else 0
+        return node.value + self._get_sum(node.left) + self._get_sum(node.right) if node else 0
 
-# Пример использования:
+if __name__ == "__main__":
+    treap = ImplicitTreap()
 
-# Создание неявного декартового дерева и его построение из массива
-array = [1, 3, 5, 7, 9, 11]
-treap = ImplicitTreap()
-treap.build(array)
+    # Test building the treap with an initial array
+    initial_array = [10, 20, 30, 40, 50]
+    treap.build(initial_array)
+    print("Treap built with initial array:", initial_array)
 
-# Получение суммы элементов от индекса 1 до индекса 4 включительно
-result_sum = treap.sum(1, 4)
-print(result_sum)
+    # Test summing a range
+    from_idx, to_idx = 1, 3
+    sum_result = treap.sum(from_idx, to_idx)
+    print(f"Sum from index {from_idx} to {to_idx}:", sum_result)
+
+    # Test inserting a new value
+    new_value = 25
+    insert_index = 2
+    treap._insert_at_index(insert_index, new_value)
+    print(f"Inserted {new_value} at index {insert_index}, all sum is:", treap.sum(0, len(initial_array)))
+
+    # Ensure the treap maintains correct structure and values after operations
+    # This might involve in-order traversal to verify the treap's shape and values
+    # For example:
+    def in_order_traversal(node):
+        if node:
+            in_order_traversal(node.left)
+            print(f"Value: {node.value}, Priority: {node.priority}, Size: {node.size}")
+            in_order_traversal(node.right)
+
+    print("In-order traversal of the treap after insertion:")
+    in_order_traversal(treap.root)
