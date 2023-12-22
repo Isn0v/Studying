@@ -1,44 +1,50 @@
 from typing import List
 
-def countSmaller(self, nums: List[int]) -> List[int]:
-        
-    res  = [0] * len(nums)
-    enum = list(enumerate(nums))
-    
-    self.merge_sort(enum, 0, len(nums) - 1, res)
-    return res
-    
-def merge_sort(self, enum, start, end, res):
-    if start >= end:
-        return
 
-    mid = start + (end - start) // 2
-    self.merge_sort(enum, start, mid, res)
-    self.merge_sort(enum, mid + 1, end, res)
-    self.merge(enum, start, mid, end, res)
+class SegmentTreeNode:
+    def __init__(self, low, high):
+        self.low = low
+        self.high = high
+        self.left = None
+        self.right = None
+        self.counter = 0
 
-def merge(self, enum, start, mid, end, res):
-    left_ptr, right_ptr = start, mid + 1
-    inversion_count = 0
-    temp = []
-    
-    while left_ptr <= mid and right_ptr <= end:
-        if enum[left_ptr][1] <= enum[right_ptr][1]:
-            temp.append(enum[left_ptr])
-            res[enum[left_ptr][0]] += inversion_count
-            left_ptr += 1
-        else: # left number > right number (we need it)
-            temp.append(enum[right_ptr])
-            inversion_count += 1
-            right_ptr += 1
-    
-    while left_ptr <= mid:
-        temp.append(enum[left_ptr])
-        res[enum[left_ptr][0]] += inversion_count
-        left_ptr += 1
-    
-    while right_ptr <= end:         
-        temp.append(enum[right_ptr])
-        right_ptr += 1
-    
-    enum[start:end+1] = temp
+
+class Solution:
+    def _build(self, left, right):
+        root = SegmentTreeNode(self.nums[left], self.nums[right])
+        if left == right:
+            return root
+
+        mid = (left + right) // 2
+        root.left = self._build(left, mid)
+        root.right = self._build(mid + 1, right)
+        return root
+
+    def _update(self, root, val):
+        if not root:
+            return
+        if root.low <= val <= root.high:
+            root.counter += 1
+            self._update(root.left, val)
+            self._update(root.right, val)
+
+    def _query(self, root, lower, upper):
+        if lower <= root.low and root.high <= upper:
+            return root.counter
+        if upper < root.low or root.high < lower:
+            return 0
+        return self._query(root.left, lower, upper) + self._query(
+            root.right, lower, upper
+        )
+
+    def countSmaller(self, nums: List[int]) -> List[int]:
+        nums = nums[::-1]
+        self.nums = sorted(list(set(nums)))
+        root = self._build(0, len(self.nums) - 1) if nums else None
+
+        res = []
+        for n in nums:
+            res.append(self._query(root, float("-inf"), n - 1))
+            self._update(root, n)
+        return res[::-1]
