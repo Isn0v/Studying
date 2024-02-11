@@ -4,8 +4,11 @@
 *.o
 *.txt
 
+!**/CMakeLists.txt
+
 .vscode/
 */.vscode/
 __pycache__
 .pytest_cache
 output
+build
