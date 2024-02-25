@@ -7,6 +7,11 @@
 #define C_KREST_KREST_LINE_H
 
 class Line {
+private:
+    static constexpr double EPS = 2.2204460492503131e-16;
+
+    double determinant(const Line &other) const;
+    
 public:
     double a{}, b{}, c{}; // Coefficients of the line equation: ax + by + c = 0
 
