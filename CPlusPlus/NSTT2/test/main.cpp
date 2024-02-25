@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../src/Line/Line.h" // Assuming the Treap class is part of this file
+#include "../src/Line/Line.h" 
 
 TEST(PointLine, PointLine) {
     Line l1({2,2},{5,5});

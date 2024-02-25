@@ -1,10 +1,8 @@
-//
-// Created by bogdan on 22.02.24.
-//
+#pragma once
+
 #include "../Point/Point.h"
 
-#ifndef C_KREST_KREST_LINE_H
-#define C_KREST_KREST_LINE_H
+
 
 class Line {
 private:
@@ -26,6 +24,3 @@ public:
     Line findPerpendicular(const Point &p) const;
     bool isOrthogonal(const Line& other) const;
 };
-
-
-#endif //C_KREST_KREST_LINE_H
