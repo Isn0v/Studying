@@ -1,9 +1,9 @@
+
+
 #include <cstdlib>
 #include <utility>
 #include <ctime>
 #include <iostream>
-#include <gtest/gtest.h>
-
 
 template <typename T>
 class TreapNode
@@ -66,21 +66,23 @@ private:
         }
     }
 
-    std::string inOrderNodes(TreapNode<T>* node)
-    {
-        if (node)
-        {
-            return inOrderNodes(node->left) + std::string(" ") + std::to_string(node->key) + std::string(" ") + inOrderNodes(node->right);
-        }
-        return "";
-    }
-
 public:
     Treap() : root(nullptr) {}
 
     ~Treap()
     {
         clear(root);
+    }
+
+    void clear()
+    {
+        clear(root);
+        root = nullptr;
+    }
+
+    TreapNode<T>* getRoot() const
+    {
+        return root;
     }
 
     void insert(int key)
@@ -97,36 +99,9 @@ public:
         delete r1;
     }
 
-    std::string inOrder()
-    {
-        return inOrderNodes(root);
-    }
-
-    // overload <<
-    friend std::ostream &operator<<(std::ostream &os, Treap &t)
-    {
-        os << t.inOrder();
-        return os;
-    }
-
 };
 
-// int main()
-// {
-//     srand(time(nullptr));
-
-//     Treap<int>* treap = new Treap<int>();
-//     for (int i = 0; i < 10; i++)
-//     {
-//         treap->insert(i);
-//     }
-
-//     treap->erase(4);
-//     treap->erase(5);
-
-//     std::cout << *treap << std::endl;
-
-//     // delete treap;
-
-//     return 0;
-// }
+// Example usage:
+// int sortedArray[] = {1, 2, 3, 4, 5};
+// Treap treap;
+// treap.linearBuild(sortedArray, sortedArray + 5);
