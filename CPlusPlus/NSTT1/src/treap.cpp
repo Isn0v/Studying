@@ -1,4 +1,4 @@
-
+#include <vector>
 
 #include <cstdlib>
 #include <utility>
@@ -21,6 +21,29 @@ class Treap
 {
 private:
     TreapNode<T> *root;
+
+    TreapNode<T> *copyNodes(TreapNode<T> *node)
+    {
+        if (!node)
+            return nullptr;
+        TreapNode<T> *newNode = new TreapNode<T>(node->key);
+        newNode->priority = node->priority;
+        newNode->left = copyNodes(node->left);
+        newNode->right = copyNodes(node->right);
+        return newNode;
+    }
+    
+    bool containsRecursive(TreapNode<T> *node, T value){
+        if (node == nullptr){
+            return false;
+        }
+        if (node->key == value){
+            return true;
+        }
+        return containsRecursive(node->left, value) || containsRecursive(node->right, value);
+    }
+    
+
 
     void clear(TreapNode<T> *t)
     {
@@ -69,6 +92,11 @@ private:
 public:
     Treap() : root(nullptr) {}
 
+    Treap(const Treap &other)
+    {
+        root = copyNodes(other.root);
+    }
+
     ~Treap()
     {
         clear(root);
@@ -80,7 +108,7 @@ public:
         root = nullptr;
     }
 
-    TreapNode<T>* getRoot() const
+    TreapNode<T> *getRoot() const
     {
         return root;
     }
@@ -99,9 +127,34 @@ public:
         delete r1;
     }
 
-};
+    bool contains(T value){
+        return this->containsRecursive(this->root, value);
+    }
 
-// Example usage:
-// int sortedArray[] = {1, 2, 3, 4, 5};
-// Treap treap;
-// treap.linearBuild(sortedArray, sortedArray + 5);
+    void asVector(TreapNode<T>* node, std::vector<T> &vec) const{
+        if (node == nullptr){
+            return;
+        }
+        asVector(node->left, vec);
+        vec.push_back(node->key);
+        asVector(node->right, vec);
+    }
+
+    Treap &operator=(const Treap &other)
+    {
+        if (this != &other)
+        {
+            clear(root);
+            root = copyNodes(other.root);
+        }
+        return *this;
+    }
+
+    bool operator==(const Treap<T> &other) const{
+        std::vector<T> thisTreapVec, otherTreapVec;
+        asVector(this->root, thisTreapVec);
+        asVector(other.root, otherTreapVec);
+        return thisTreapVec == otherTreapVec;
+    }
+
+};

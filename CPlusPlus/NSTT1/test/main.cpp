@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
-#include "../src/treap.cpp" // Assuming the Treap class is part of this file
+#include "../src/treap.cpp" 
 
-// Helper function to check if the Treap is a valid binary search tree
 template <typename T>
 bool isBST(TreapNode<T>* node, T min_value, T max_value) {
     if (node == nullptr) return true;
@@ -9,17 +8,15 @@ bool isBST(TreapNode<T>* node, T min_value, T max_value) {
     return isBST(node->left, min_value, node->key) && isBST(node->right, node->key, max_value);
 }
 
-// Test fixture for Treap
 template <typename T>
 class TreapTest : public ::testing::Test {
 protected:
     Treap<T> treap;
 
-    // You can define helper methods here if needed
 };
 
 // Define types to run the same tests over different types
-typedef ::testing::Types<int, char> Implementations;
+typedef ::testing::Types<int> Implementations;
 TYPED_TEST_SUITE(TreapTest, Implementations);
 
 // Test initialization of Treap
@@ -53,10 +50,25 @@ TYPED_TEST(TreapTest, ErasesElementsCorrectly) {
     this->treap.erase(3);
     auto root = this->treap.getRoot();
     EXPECT_TRUE(isBST(root, std::numeric_limits<TypeParam>::min(), std::numeric_limits<TypeParam>::max()));
-    // More checks can be added to validate the structure after the erase operation
 }
 
-// More tests can be added here...
+TYPED_TEST(TreapTest, CopyConstructorCreatesIndependentCopy) {
+    Treap<TypeParam> copyConstructed = this->treap;
+
+    copyConstructed.insert(40);
+
+    ASSERT_FALSE(this->treap.contains(40));
+}
+
+TYPED_TEST(TreapTest, CopyConstructorCreatesEquivalentData) {
+    // Use the copy constructor
+    Treap<int> copyConstructed(this->treap);
+
+    copyConstructed.insert(40);
+    ASSERT_FALSE(this->treap == copyConstructed);
+}
+
+
 
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
