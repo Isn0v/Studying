@@ -10,6 +10,7 @@ int main() {
     Treap<int> other;
     other.insert(5);
 
-    std::cout << (treap == other) << std::endl;
+    bool res = (treap == other);
+    std::cout << res << std::endl;
     return 0;
 }
