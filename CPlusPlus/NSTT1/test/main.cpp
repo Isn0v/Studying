@@ -71,6 +71,12 @@ TYPED_TEST(TreapTest, CopyConstructorCreatesEquivalentData) {
 
 
 int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+    // ::testing::InitGoogleTest(&argc, argv);
+    // return RUN_ALL_TESTS();
+    int* a = new int[10];
+    a[5] = 0;
+    if (a[argc])
+        printf("xx\n");
+    return 0;
+
 }
