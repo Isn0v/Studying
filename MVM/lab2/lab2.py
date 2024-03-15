@@ -117,7 +117,6 @@ def newton_method_solution(f, x0, epsilon=sys.float_info.epsilon, dtype=np.float
         
         x = dtype(x) - f(dtype(x)) / df(dtype(x))
         if path_point_convergence_flag:
-            print(x)
             convergent_roots.append(x)
             
         if show_convergence:
@@ -137,7 +136,6 @@ def draw_complex(path_point_convergence_flag=False):
     y_range = np.arange(-1, 1, 0.01)
     X, Y = np.meshgrid(x_range, y_range)
     Z = X + 1j * Y
-    # print(Z)
 
     roots = np.zeros(Z.shape, dtype=np.complex128)
 
@@ -164,7 +162,7 @@ def draw_complex(path_point_convergence_flag=False):
     plt.colorbar()
     
     plt.annotate('start', xy=(path_real[0], path_imag[0]), xytext=(path_real[0]-0.1, path_imag[0]+0.1))
-    plt.annotate('end', xy=(path_real[-1], path_imag[-1]), xytext=(path_real[0]-0.1, path_imag[0]+0.1))
+    plt.annotate('end', xy=(path_real[-1], path_imag[-1]), xytext=(path_real[-1]-0.1, path_imag[-1]+0.1))
     plt.plot(path_real[-1], path_imag[-1], 'ro')  # Mark the last point (root) with a red circle
 
     # Annotate the starting point
