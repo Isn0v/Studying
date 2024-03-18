@@ -1,4 +1,5 @@
 #include <cmath>
+#include <optional>
 #include "Line.h"
 bool Line::hasIntersection(const Line &other) const
 {
@@ -24,12 +25,20 @@ Line::Line(double a_, double b_, double c_)
     c = c_;
 }
 
-Point Line::findIntersection(const Line &other) const
+std::optional<Point> Line::findIntersection(const Line &other) const
 {
     double det = determinant(other);
+
+    if (det == 0){
+        return std::nullopt;
+    }
+
     double x = (other.b * c - b * other.c) / det;
     double y = (a * other.c - other.a * c) / det;
-    return {x, y};
+    return Point{
+        .x = x,
+        .y = y
+    };
 }
 
 Line Line::findPerpendicular(const Point &p) const

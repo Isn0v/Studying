@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../Point/Point.h"
-
-
+struct Point {
+    double x, y;
+};
 
 class Line {
 private:
@@ -10,8 +10,8 @@ private:
 
     double determinant(const Line &other) const;
     
-public:
     double a{}, b{}, c{}; // Coefficients of the line equation: ax + by + c = 0
+public:
 
     Line(double a, double b, double c);
 
@@ -19,8 +19,9 @@ public:
 
     bool hasIntersection(const Line &other) const;
 
-    Point findIntersection(const Line &other) const;
+    std::optional<Point> findIntersection(const Line &other) const;
 
     Line findPerpendicular(const Point &p) const;
+
     bool isOrthogonal(const Line& other) const;
 };
