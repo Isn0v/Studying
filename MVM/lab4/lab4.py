@@ -38,14 +38,14 @@ def simpson_integral(f, interval, N_parts=1000):
     if b == 1:
         b = b - sys.float_info.epsilon
 
-    f_roots_list = [(f(a), a), (f((a+b)/2), (a+b)/2), (f(b), b)]
-    
-    # не понимаю зачем он нужен, если интеграл можно считать от изначальной функции
-    p = get_interpolation(2, f_roots_list)
+    # f_roots_list = [(f(a), a), (f((a+b)/2), (a+b)/2), (f(b), b)]
 
-    x = sympy.Symbol('x')
-    d_4 = sympy.diff(f(x), x, x, x, x)
-    d_4f = sympy.lambdify(x, d_4)
+    # # не понимаю зачем он нужен, если интеграл можно считать от изначальной функции
+    # p = get_interpolation(2, f_roots_list)
+
+    # x = sympy.Symbol('x')
+    # d_4 = sympy.diff(f(x), x, x, x, x)
+    # d_4f = sympy.lambdify(x, d_4)
 
     interval_array = np.linspace(a, b, N_parts)
 
@@ -60,22 +60,27 @@ def simpson_integral(f, interval, N_parts=1000):
     h = (b - a) / N_parts
 
     f_for_int = f
-    integral_result = h/3*(f_for_int(a) + 4*np.sum(np.array([f_for_int(interval_array[2*i - 1]) for i in range(1, N_parts//2)])) + 2*np.sum(
-        np.array([f_for_int(interval_array[2*i]) for i in range(2, N_parts//2)])) + f_for_int(b))
+    integral_result = h/3*(f_for_int(a) + 4*np.sum(np.array([f_for_int(interval_array[2*i - 1]) for i in range(1, N_parts//2 + 1)]))
+                           + 2*np.sum(np.array([f_for_int(interval_array[2*i]) for i in range(1, N_parts//2)])) + f_for_int(b))
 
-    interval_array = np.linspace(a, b, 10000000)
-    m_4 = np.max(np.absolute(d_4f(interval_array)))
+    # обе подынтегральные функции, данные в задаче,
+    # не являются гладкими в области интегрирования,
+    # поэтому считать погрещность бессмысленно
+    # interval_array = np.linspace(a, b, 10000000)
+    # m_4 = np.max(np.absolute(d_4f(interval_array)))
 
-    R = (b - a)*h**4*m_4/2880  # понятия не имею почему число такое большое
+    # R = (b - a)*h**4*m_4/2880
 
     plt.show()
-    return integral_result, R
+    return integral_result  # , R
 
 
 if __name__ == '__main__':
     # 1 интеграл
-    res, R = simpson_integral(func_a, interval_for_a, N_parts=100000)
-    print(res, R)
+    actual = 8.03491067542
+    res = simpson_integral(func_a, interval_for_a, N_parts=1000000)
+    print(res, abs(res-actual))
+    # 8.03491975440937 9.07898936652884e-6
 
     # замена для 2 интеграла
     def x_t(t):
@@ -85,5 +90,7 @@ if __name__ == '__main__':
         return func_b(x_t(t))/(1-t)**2
 
     # 2 интеграл
-    res, R = simpson_integral(f_b_with_t, interval_for_a, N_parts=1000)
-    print(res, R)
+    # actual = 2.98100345256
+    # res = simpson_integral(f_b_with_t, interval_for_a, N_parts=1000000)
+    # print(res, abs(res-actual))
+    # 2.98100047163605 2.98092394990235e-6
