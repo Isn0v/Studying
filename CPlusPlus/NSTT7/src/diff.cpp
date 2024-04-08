@@ -10,9 +10,6 @@ Expression *Var::diff(const std::string &variable) const {
 }
 
 Expression *Exponent::diff(const std::string &variable) const {
-  // The derivative of an exponent is given by the power rule (simplified
-  // version) For simplicity, we're assuming the exponent is a constant A full
-  // implementation would handle the general case with the chain rule
   if (dynamic_cast<Var *>(right) != nullptr) {
     // d(u^y)/dx = u^y * d(y*ln(u))/dx = u^y * ln(u) * dy/dx
     throw std::runtime_error("Chain rule not implemented yet");
