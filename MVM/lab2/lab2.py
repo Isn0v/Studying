@@ -26,6 +26,7 @@ def bisection_solution(f, n, interval=(-math.pi/2, math.pi/2), epsilon=sys.float
         return None
     c = a
     while (b - a) / 2 >= epsilon:
+        print(c, iterations)
         c = (a + b) / 2
         iterations += 1
         if f(c) == 0.0:
@@ -34,32 +35,58 @@ def bisection_solution(f, n, interval=(-math.pi/2, math.pi/2), epsilon=sys.float
             b = c
         else:
             a = c
+        if (b - a) / 2 < epsilon:
+            break
     return c, iterations
 
+def find_nearest_index(array, value, side='left'):
+    index = np.searchsorted(array, value, side=side)
+    if index > 0 and (index == len(array) or np.abs(value - array[index - 1]) < np.abs(value - array[index])):
+        return index - 1
+    else:
+        return index
 
-def simple_iteration_solution(f, n, interval=(-math.pi/2, math.pi/2), epsilon=sys.float_info.epsilon):
+def simple_iteration_solution(f, n, interval=(-math.pi/2, math.pi/2), interval_division=20, epsilon=sys.float_info.epsilon, show_iterations=False):
     
     a = np.float64(interval[0] + math.pi*n + epsilon)
-    b = np.float64(interval[1]*n + math.pi*n - epsilon)
+    b = np.float64(interval[1] + math.pi*n - epsilon)
     
     x_symb = sympy.Symbol('x')
     df_symb = sympy.diff(f(x_symb))
     df = sympy.lambdify(x_symb, df_symb, 'numpy')
     
-    lin_sp = np.linspace(a, b, 50)
+    lin_sp = np.linspace(a, b, interval_division)
+    func_sp = np.array([f(x) for x in lin_sp])
+    nearest_index = find_nearest_index(func_sp, 0)
+    
+    nearest_1 = lin_sp[nearest_index]
+    index_offset = 1 if func_sp[nearest_index] < 0 else -1
+    
+    nearest_2 = lin_sp[nearest_index+index_offset]
     
     x0 = 0
+    if df(nearest_2) < 1:
+        x0 = nearest_2
+    elif df(nearest_1) < 1:
+        x0 = nearest_1
+    else:
+        print("Simple iteration method fails with such a small interval division or no convergent point.")
+        return None
+    
     iterations = 0
-    for x in lin_sp:
-        x0 = x
-        if df(x0) < 1:
-            break
+    # for x in lin_sp:
+    #     x0 = x
+    #     if df(x0) < 1:
+    #         break
 
     lambda0 = df(x0)
+    x = x0
 
     while True:
         # print(x)
         iterations += 1
+        if show_iterations:
+            print(x, iterations)
         
         x = x - lambda0 * f(x)
         if abs(x - x0) < epsilon:
@@ -77,21 +104,28 @@ def get_tangent_f(f, df, x0):
 
 
 # def secant_method_solution(f, x0, x1, epsilon=sys.float_info.epsilon):
-def secant_method_solution(f, n, interval=(-math.pi/2, math.pi/2), epsilon=sys.float_info.epsilon, interval_division_points=20):
+def secant_method_solution(f, n, interval=(-math.pi/2, math.pi/2), epsilon=sys.float_info.epsilon, interval_division=20):
     # x0 -> starting point
     # x1 -> point to be changed
     a = np.float64(interval[0] + math.pi*n + epsilon)
     b = np.float64(interval[1] + math.pi*n - epsilon)
     
-    sign_n = -1 if n < 0 else 1
+    lin_sp = np.linspace(a, b, interval_division)
+    func_sp = np.array([f(x) for x in lin_sp])
     
-    lin_sp = np.linspace(a, b, interval_division_points)
+    
     iterations = 0
-    x0 = lin_sp[-1*sign_n]
-    x = lin_sp[-2*sign_n]
+    
+    nearest_index = find_nearest_index(func_sp, 0)
+    nearest_left = lin_sp[nearest_index]
+    index_offset = 1 if func_sp[nearest_index] < 0 else -1
+    nearest_right = lin_sp[nearest_index+index_offset]
+
+    
+    x0 = nearest_right
+    x = nearest_left
 
     while True:
-        # print(x)
         x_temp = x
         x = x - f(x) * (x - x0) / (f(x) - f(x0))
         x0 = x_temp
@@ -112,13 +146,21 @@ particular_point = np.complex128(0.4 + -0.5j)
 convergent_roots = [particular_point]
 
 
-def newton_method_solution(f, n=0, interval=(-math.pi/2, math.pi/2), z0=0, epsilon=sys.float_info.epsilon, dtype=np.float64, show_convergence=False):
+def newton_method_solution(f, n=0, interval=(-math.pi/2, math.pi/2), z0=0, interval_division=20, epsilon=sys.float_info.epsilon, dtype=np.float64, show_convergence=False):
 
     
     a = np.float64(interval[0] + math.pi*n + epsilon)
-    b = np.float64(interval[1]*n + math.pi*n - epsilon)
+    b = np.float64(interval[1] + math.pi*n - epsilon)
 
-    lin_sp = np.linspace(a, b, 50)
+    lin_sp = np.linspace(a, b, interval_division)
+    func_sp = np.array([f(x) for x in lin_sp])
+    
+    nearest_index = find_nearest_index(func_sp, 0)
+    
+    nearest_left = lin_sp[nearest_index]
+    index_offset = 1 if func_sp[nearest_index] < 0 else -1
+    nearest_right = lin_sp[nearest_index+index_offset]
+    
     
     x_symb = sympy.Symbol('x')
     df_symb = sympy.diff(f(x_symb))
@@ -128,30 +170,37 @@ def newton_method_solution(f, n=0, interval=(-math.pi/2, math.pi/2), z0=0, epsil
     d2f = sympy.lambdify(x_symb, d2f_symb)
     
     x0 = 0
-    path_point_convergence_flag = False
+    if f(nearest_left)*d2f(nearest_left) > 0:
+        x0 = nearest_left
+    elif f(nearest_right)*d2f(nearest_right) > 0:
+        x0 = nearest_right
+    else:
+        print("Newton method fails with such a small interval division or no convergent point.")
+        return None
+    # path_point_convergence_flag = False
     
-    if dtype != np.complex128:
-        for x in lin_sp:
-            if abs(f(x0)*d2f(x0)) < abs(df(x0)**2):
-                x0 = x
-                break
-    else:    
+    # if dtype != np.complex128:
+    # for x in lin_sp:
+    #     if abs(f(x0)*d2f(x0)) < abs(df(x0)**2):
+    #         x0 = x
+    #         break
+    # else:    
 
-        num_to_round = 4
+        # num_to_round = 4
 
-        if dtype == np.complex128:
-            round_x0 = np.complex128(
-                round(x0.real, num_to_round) + round(x0.imag, num_to_round)*1j)
-            round_convergent_point = np.complex128([round(
-                particular_point.real, num_to_round) + round(particular_point.imag, num_to_round)*1j])
+        # if dtype == np.complex128:
+        #     round_x0 = np.complex128(
+        #         round(x0.real, num_to_round) + round(x0.imag, num_to_round)*1j)
+        #     round_convergent_point = np.complex128([round(
+        #         particular_point.real, num_to_round) + round(particular_point.imag, num_to_round)*1j])
 
-        if round_x0 == round_convergent_point:
-            path_point_convergence_flag = True
+        # if round_x0 == round_convergent_point:
+        #     path_point_convergence_flag = True
         
-        x0 = z0
+        # x0 = z0
         
     iterations = 0
-
+    x = x0
 
     # if abs(f(x0)*d2f(x0)) >= abs(df(x0)**2):
     #     print("Newton method fails.")
@@ -175,11 +224,11 @@ def newton_method_solution(f, n=0, interval=(-math.pi/2, math.pi/2), z0=0, epsil
         # print(x)
 
         x = dtype(x) - f(dtype(x)) / df(dtype(x))
-        if path_point_convergence_flag:
-            convergent_roots.append(x)
+        # if path_point_convergence_flag:
+        #     convergent_roots.append(x)
 
-        if show_convergence:
-            print(x)
+        # if show_convergence:
+        #     print(x)
 
         iterations += 1
         
@@ -236,7 +285,7 @@ def draw_complex(path_point_convergence_flag=False):
 
 
 if __name__ == "__main__":
-    # print("Newton method solution: ", newton_method_solution(func_to_solve, n=-3))  
-    # print("Secant method solution: ", secant_method_solution(func_to_solve, n=-2))
-    # print(bisection_solution(func_to_solve, n=1))
-    print(simple_iteration_solution(func_to_solve, n=0, epsilon=0.1))
+    print("Newton method solution: ", newton_method_solution(func_to_solve, n=2, interval_division=100))  
+    # print("Secant method solution: ", secant_method_solution(func_to_solve, n=-1))
+    # print(bisection_solution(func_to_solve, n=-1, epsilon=10e-5))
+    # print(simple_iteration_solution(func_to_solve, n=0, interval_division=200, show_iterations=True, epsilon=10e-5))
