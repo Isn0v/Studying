@@ -1,88 +1,92 @@
 #include "gtest/gtest.h"
-#include "../src/SquareMatrix.h"
+#include <SquareMatrix.h>
 
-TEST(SquareMatrixTest, EqualityOperator) {
-    SquareMatrix matrix1(2);
-    matrix1.set(0, 0, 1.0);
-    matrix1.set(0, 1, 2.0);
-    matrix1.set(1, 0, 3.0);
-    matrix1.set(1, 1, 4.0);
-
-    SquareMatrix matrix2(2);
-    matrix2.set(0, 0, 1.0);
-    matrix2.set(0, 1, 2.0);
-    matrix2.set(1, 0, 3.0);
-    matrix2.set(1, 1, 4.0);
-
-    EXPECT_EQ(matrix1, matrix2);
-
-    matrix2.set(0, 0, 5.0);
-
-    EXPECT_NE(matrix1, matrix2);
+TEST(SquareMatrixTest, ConstructsWithSize)
+{
+    SquareMatrix<int> matrix(3);
+    ASSERT_EQ(matrix.get_size(), 3);
 }
 
-TEST(SquareMatrixTest, AdditionOperator) {
-    SquareMatrix matrix1(2);
-    matrix1.set(0, 0, 1.0);
-    matrix1.set(0, 1, 2.0);
-    matrix1.set(1, 0, 3.0);
-    matrix1.set(1, 1, 4.0);
-
-    SquareMatrix matrix2(2);
-    matrix2.set(0, 0, 5.0);
-    matrix2.set(0, 1, 6.0);
-    matrix2.set(1, 0, 7.0);
-    matrix2.set(1, 1, 8.0);
-
-    SquareMatrix expected(2);
-    expected.set(0, 0, 6.0);
-    expected.set(0, 1, 8.0);
-    expected.set(1, 0, 10.0);
-    expected.set(1, 1, 12.0);
-
-    EXPECT_EQ(matrix1 + matrix2, expected);
+TEST(SquareMatrixTest, ConstructsFromDiagonal)
+{
+    std::vector<int> diagonal{1, 2, 3};
+    SquareMatrix<int> matrix(diagonal);
+    ASSERT_EQ(matrix[0][0], 1);
+    ASSERT_EQ(matrix[1][1], 2);
+    ASSERT_EQ(matrix[2][2], 3);
 }
 
-TEST(SquareMatrixTest, MultiplicationOperator) {
-    SquareMatrix matrix1(2);
-    matrix1.set(0, 0, 1.0);
-    matrix1.set(0, 1, 2.0);
-    matrix1.set(1, 0, 3.0);
-    matrix1.set(1, 1, 4.0);
-
-    SquareMatrix matrix2(2);
-    matrix2.set(0, 0, 5.0);
-    matrix2.set(0, 1, 6.0);
-    matrix2.set(1, 0, 7.0);
-    matrix2.set(1, 1, 8.0);
-
-    SquareMatrix expected(2);
-    expected.set(0, 0, 19.0);
-    expected.set(0, 1, 22.0);
-    expected.set(1, 0, 43.0);
-    expected.set(1, 1, 50.0);
-
-    EXPECT_EQ(matrix1 * matrix2, expected);
+TEST(SquareMatrixTest, CopyConstructor)
+{
+    SquareMatrix<int> original(2);
+    SquareMatrix<int> copy = original;
+    ASSERT_TRUE(copy == original);
 }
 
-TEST(SquareMatrixTest, ScalarMultiplicationOperator) {
-    SquareMatrix matrix(2);
-    matrix.set(0, 0, 1.0);
-    matrix.set(0, 1, 2.0);
-    matrix.set(1, 0, 3.0);
-    matrix.set(1, 1, 4.0);
+TEST(SquareMatrixTest, AddsMatrices)
+{
+    SquareMatrix<int> matrix1(2, 1);
+    SquareMatrix<int> matrix2(2, 2);
+    SquareMatrix<int> sum = matrix1 + matrix2;
 
-    SquareMatrix expected(2);
-    expected.set(0, 0, 2.0);
-    expected.set(0, 1, 4.0);
-    expected.set(1, 0, 6.0);
-    expected.set(1, 1, 8.0);
-
-    EXPECT_EQ(matrix * 2.0, expected);
+    ASSERT_TRUE(sum == SquareMatrix<int>(2, 3));
 }
 
-// Add more tests as needed...
+TEST(SquareMatrixTest, MultipliesByMatrix)
+{
+    SquareMatrix<int> matrix1(2, 1);
+    SquareMatrix<int> matrix2(2, 2);
+    SquareMatrix<int> expected(2, 4);
+    SquareMatrix<int> result = matrix1 * matrix2;
+    ASSERT_EQ(result, expected);
 
+    SquareMatrix<int> matrix3(2, 1);
+    int scalar = 2;
+    SquareMatrix<int> expected2(2, 2);
+    SquareMatrix<int> result2 = matrix3 * scalar;
+    ASSERT_EQ(result2, expected2);
+
+    SquareMatrix<int> matrix4(2, 1);
+    SquareMatrix<int> matrix5(3, 2);
+    ASSERT_THROW(matrix4 * matrix5, std::invalid_argument);
+
+    SquareMatrix<int> matrix6(2, 1);
+    SquareMatrix<int> emptyMatrix;
+    ASSERT_THROW(matrix6 * emptyMatrix, std::invalid_argument);
+
+    SquareMatrix<int> emptyMatrix2;
+    SquareMatrix<int> matrix7(2, 2);
+    ASSERT_THROW(emptyMatrix2 * matrix7, std::invalid_argument);
+}
+
+TEST(SquareMatrixTest, EqualityOperator)
+{
+    SquareMatrix<int> matrix1(2, 0);
+    SquareMatrix<int> matrix2(2, 0);
+    ASSERT_TRUE(matrix1 == matrix2);
+}
+
+TEST(SquareMatrixTest, InequalityOperator)
+{
+    SquareMatrix<int> matrix1(2, 0);
+    SquareMatrix<int> matrix2(3, 0);
+    ASSERT_TRUE(matrix1 != matrix2);
+}
+
+TEST(SquareMatrixTest, MoveConstructor)
+{
+    SquareMatrix<int> original(2, 3);
+    SquareMatrix<int> moved(std::move(original));
+    ASSERT_EQ(moved.get_size(), 2);
+    ASSERT_TRUE(moved == SquareMatrix<int>(2, 3));
+}
+
+TEST(SquareMatrixTest, DoubleConversion)
+{
+    SquareMatrix<int> matrix(2, 2);
+    double scalar = static_cast<double>(matrix);
+    ASSERT_EQ(scalar, 8.0);
+}
 
 int main(int argc, char **argv)
 {

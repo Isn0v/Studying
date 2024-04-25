@@ -1,43 +1,77 @@
-#include "../src/diff.h"
+#include <diff.h>
 #include "gtest/gtest.h"
 
-class ExponentDiffTest : public ::testing::Test {
-protected:
-  void SetUp() override {
-    // Setup any common objects or variables needed for the tests
-  }
+TEST(DiffTest, AddVarConst)
+{
+  std::shared_ptr<Expression> a = std::make_shared<Var>("y");
+  std::shared_ptr<Expression> b = std::make_shared<Val>(3);
+  std::shared_ptr<Expression> c = std::make_shared<Add>(a, b);
+  EXPECT_EQ(c->diff("x")->toStringStream().str(), "(0 + 0)");
 
-  void TearDown() override {
-    // Clean up any resources
-  }
-};
-
-TEST_F(ExponentDiffTest, ConstantExponent) {
-  Expression *base = new Val(2);
-  Expression *exponent = new Val(3);
-  Exponent *exponentObj = new Exponent(base, exponent);
-
-  Expression *result = exponentObj->diff("x");
+  std::shared_ptr<Expression> d = std::make_shared<Var>("y");
+  std::shared_ptr<Expression> e = std::make_shared<Val>(2);
+  std::shared_ptr<Expression> f = std::make_shared<Add>(d, e);
+  EXPECT_EQ(f->diff("y")->toStringStream().str(), "(1 + 0)");
 }
 
-TEST_F(ExponentDiffTest, VariableExponent) {
+TEST(DiffTest, MultVarConst)
+{
+  std::shared_ptr<Expression> a = std::make_shared<Var>("x");
+  std::shared_ptr<Expression> b = std::make_shared<Val>(3);
+  std::shared_ptr<Expression> c = std::make_shared<Mult>(a, b);
+  EXPECT_EQ(c->diff("x")->toStringStream().str(), "((1 * 3) + (x * 0))");
 
-  Expression *base = new Var("x");
-  Expression *exponent = new Val(3);
-  Exponent *exponentObj = new Exponent(base, exponent);
+  std::shared_ptr<Expression> d = std::make_shared<Var>("y");
+  std::shared_ptr<Expression> e = std::make_shared<Val>(2);
+  std::shared_ptr<Expression> f = std::make_shared<Mult>(d, e);
+  EXPECT_EQ(f->diff("y")->toStringStream().str(), "((1 * 2) + (y * 0))");
 }
 
-TEST_F(ExponentDiffTest, AddDiffMethod) {
-  Expression *left = new Val(2);
-  Expression *right = new Val(3);
-  Add *addObj = new Add(left, right);
+TEST(DiffTest, DivVarConst)
+{
+  // Testing division of a variable by a constant
+  std::shared_ptr<Expression> a = std::make_shared<Var>("x");
+  std::shared_ptr<Expression> b = std::make_shared<Val>(2);
+  std::shared_ptr<Expression> c = std::make_shared<Div>(a, b);
+  EXPECT_EQ(c->diff("x")->toStringStream().str(), "(((1 * 2) - (x * 0)) / (2 * 2))");
 
-  Expression *result = addObj->diff("x");
+  // Testing division of a constant by a variable
+  std::shared_ptr<Expression> d = std::make_shared<Var>("y");
+  std::shared_ptr<Expression> e = std::make_shared<Val>(4);
+  std::shared_ptr<Expression> f = std::make_shared<Div>(e, d);
+  EXPECT_EQ(f->diff("y")->toStringStream().str(), "(((0 * y) - (4 * 1)) / (y * y))");
 }
 
-// Add more test cases as needed to cover all scenarios
+TEST(DiffTest, ExpVarConst)
+{
+  std::shared_ptr<Expression> a = std::make_shared<Var>("x");
+  std::shared_ptr<Expression> b = std::make_shared<Val>(2);
+  std::shared_ptr<Expression> c = std::make_shared<Exponent>(a, b);
+  EXPECT_EQ(c->diff("x")->toStringStream().str(), "((2 * (x ^ (2 - 1))) * 1)");
+}
 
-int main(int argc, char **argv) {
+TEST(DiffTest, ExpConstVar)
+{
+  std::shared_ptr<Expression> a = std::make_shared<Val>(2);
+  std::shared_ptr<Expression> b = std::make_shared<Var>("x");
+  std::shared_ptr<Expression> c = std::make_shared<Exponent>(a, b);
+  ASSERT_THROW(c->diff("x")->toStringStream().str(), std::runtime_error);
+}
+
+TEST(DiffTest, ExpConstConst)
+{
+  std::shared_ptr<Expression> a = std::make_shared<Val>(2);
+  std::shared_ptr<Expression> b = std::make_shared<Val>(3);
+  std::shared_ptr<Expression> c = std::make_shared<Exponent>(a, b);
+  EXPECT_EQ(c->diff("x")->toStringStream().str(), "0");
+}
+
+// TEST(DiffTest, AddConst) {
+
+// }
+
+int main(int argc, char **argv)
+{
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

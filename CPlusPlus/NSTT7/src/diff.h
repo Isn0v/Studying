@@ -1,74 +1,138 @@
-#include <string>
+#include <sstream>
+#include <memory>
 
-class Expression {
+class Expression
+{
+
 public:
   virtual ~Expression() = default;
-  virtual Expression *diff(const std::string &variable) const = 0;
+  virtual std::shared_ptr<Expression> diff(const std::string &variable) const = 0;
+  virtual std::stringstream toStringStream() const = 0;
 };
 
-class Binary : public Expression {
+class Binary : public Expression
+{
 protected:
-  Expression *left;
-  Expression *right;
+  std::shared_ptr<Expression> left, right;
+  // Expression *left;
+  // Expression *right;
 
 public:
-  Binary(Expression *l, Expression *r) : left(l), right(r) {}
+  Binary(std::shared_ptr<Expression> l, std::shared_ptr<Expression> r) : left(l), right(r) {}
+  // ~Binary() override
+  // {
+  //   left.reset();
+  //   right.reset();
+  // }
 };
 
-class Unary : public Expression {
+class Unary : public Expression
+{
 protected:
-  Expression *expression;
+  // Expression *expression;
+  std::shared_ptr<Expression> expression;
 
 public:
-  Unary(Expression *expr) : expression(expr) {}
+  Unary(std::shared_ptr<Expression> expr) : expression(expr) {}
+  // ~Unary() override { expression.reset(); }
 };
 
-class Add : public Binary {
+class Add : public Binary
+{
 public:
-  Add(Expression *l, Expression *r) : Binary(l, r) {}
-  Expression *diff(const std::string &variable) const override;
+  Add(std::shared_ptr<Expression> l, std::shared_ptr<Expression> r) : Binary(l, r) {}
+  std::shared_ptr<Expression> diff(const std::string &variable) const override;
+  std::stringstream toStringStream() const override
+  {
+    std::stringstream ss;
+    ss << "(" << left->toStringStream().str() << " + " << right->toStringStream().str() << ")";
+    return ss;
+  }
 };
 
-class Sub : public Binary {
+class Sub : public Binary
+{
 public:
-  Sub(Expression *l, Expression *r) : Binary(l, r) {}
-  Expression *diff(const std::string &variable) const override;
+  Sub(std::shared_ptr<Expression> l, std::shared_ptr<Expression> r) : Binary(l, r) {}
+  std::shared_ptr<Expression> diff(const std::string &variable) const override;
+  std::stringstream toStringStream() const override
+  {
+    std::stringstream ss;
+    ss << "(" << left->toStringStream().str() << " - " << right->toStringStream().str() << ")";
+    return ss;
+  }
 };
 
-class Mult : public Binary {
+class Mult : public Binary
+{
 public:
-  Mult(Expression *l, Expression *r) : Binary(l, r) {}
-  Expression *diff(const std::string &variable) const override;
+  Mult(std::shared_ptr<Expression> l, std::shared_ptr<Expression> r) : Binary(l, r) {}
+  std::shared_ptr<Expression> diff(const std::string &variable) const override;
+  std::stringstream toStringStream() const override
+  {
+    std::stringstream ss;
+    ss << "(" << left->toStringStream().str() << " * " << right->toStringStream().str() << ")";
+    return ss;
+  }
 };
 
-class Div : public Binary {
+class Div : public Binary
+{
 public:
-  Div(Expression *l, Expression *r) : Binary(l, r) {}
-  Expression *diff(const std::string &variable) const override;
+  Div(std::shared_ptr<Expression> l, std::shared_ptr<Expression> r) : Binary(l, r) {}
+  std::shared_ptr<Expression> diff(const std::string &variable) const override;
+  std::stringstream toStringStream() const override
+  {
+    std::stringstream ss;
+    ss << "(" << left->toStringStream().str() << " / " << right->toStringStream().str() << ")";
+    return ss;
+  }
 };
 
-class Exponent : public Binary {
+class Exponent : public Binary
+{
 public:
-  Exponent(Expression *base, Expression *exponent) : Binary(base, exponent) {}
-  Expression *diff(const std::string &variable) const override;
+  Exponent(std::shared_ptr<Expression> base, std::shared_ptr<Expression> exponent) : Binary(base, exponent) {}
+  std::shared_ptr<Expression> diff(const std::string &variable) const override;
+  std::stringstream toStringStream() const override
+  {
+    std::stringstream ss;
+    ss << "(" << left->toStringStream().str() << " ^ " << right->toStringStream().str() << ")";
+    return ss;
+  }
 };
 
-class Var : public Expression {
+class Var : public Expression
+{
 private:
   std::string name;
 
 public:
   Var(const std::string &n) : name(n) {}
-  Expression *diff(const std::string &variable) const override;
+  std::shared_ptr<Expression> diff(const std::string &variable) const override;
   std::string getName() const { return name; }
+  std::stringstream toStringStream() const override
+  {
+    std::stringstream ss;
+    ss << name;
+    return ss;
+  }
 };
 
-class Val : public Expression {
+class Val : public Expression
+{
 private:
-  double value;
+  int value;
 
 public:
-  Val(double val) : value(val) {}
-  Expression *diff(const std::string &variable) const override;
-  double getValue() const { return value; }
+  Val(int val) : value(val) {}
+
+  std::shared_ptr<Expression> diff(const std::string &variable) const override;
+  int getValue() const { return value; }
+  std::stringstream toStringStream() const override
+  {
+    std::stringstream ss;
+    ss << value;
+    return ss;
+  }
 };
