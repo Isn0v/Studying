@@ -1,38 +1,11 @@
 import numpy as np
 
 def thomas_algorithm(a, b, c, d):
-    """
-    Thomas algorithm for solving tridiagonal systems of the form
-
-        a[i] * x[i-1] + b[i] * x[i] + c[i] * x[i+1] = d[i]
-
-    for i = 1, ..., n-1
-
-    where a[0] = c[0] = 0 and b[0] and b[n-1] are not zero.
-
-    Parameters
-    ----------
-    a : array_like
-        Lower diagonal elements of tridiagonal matrix
-    b : array_like
-        Diagonal elements of tridiagonal matrix
-    c : array_like
-        Upper diagonal elements of tridiagonal matrix
-    d : array_like
-        Right-hand side vector
-
-    Returns
-    -------
-    x : ndarray
-        Solution vector
-
-    """
     n = len(d)
-    cp = np.zeros(n-1)  # c[i+1] * x[i+1]
-    dp = np.zeros(n)    # d[i] - a[i] * x[i-1]
+    cp = np.zeros(n-1)  
+    dp = np.zeros(n)    
 
     cp[0] = c[0] / b[0]
-    # cp[0] = 0
     dp[0] = d[0] / b[0]
 
     for i in range(1, n-1):
