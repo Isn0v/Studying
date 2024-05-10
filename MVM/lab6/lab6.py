@@ -105,7 +105,7 @@ def lorenz_z(x, y, z, beta):
 def third_task():
     sigma = 10
     beta = 8/3
-    rho = 28 # variated
+    rho = 10 # variated
 
     def lorenz_x_wrapper(y, t):
         return lorenz_x(y[0], y[1], y[2], sigma)
@@ -124,7 +124,8 @@ def third_task():
     # plt.legend()
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    ax.plot(x_values, y_values, z_values)
+    # ax.plot(x_values, y_values, z_values)
+    ax.scatter(x_values, y_values, z_values, s=2)
     
     plt.show()
 
@@ -149,13 +150,16 @@ def second_task():
     def lotka_volterra_2(y, t):
         return lotka_volterra_wrapper(y, t, 1)
     
-    initaial_values = [20, 10]
+    initaial_values = [5, 10]
     
-    time_points, x_values, y_values = rk4_system(lotka_volterra_1, lotka_volterra_2, initaial_values[0], initaial_values[1], 0, 100, 1000)
+    time_points, x_values, y_values = rk4_system(lotka_volterra_1, lotka_volterra_2, initaial_values[0], initaial_values[1], 0, 10, 1000)
     
-    plt.plot(time_points, x_values, label="prey")
-    plt.plot(time_points, y_values, label="predator")
+    # plt.plot(time_points, x_values, label="prey")
+    # plt.plot(time_points, y_values, label="predator")
+    plt.plot(x_values, y_values, label="predator-prey")
+    # plt.plot(y_values, x_values, label="predator-prey")
     plt.legend()
+    
     plt.show()
     
 
@@ -180,8 +184,10 @@ def first_task():
     
     # plt.plot(time_points, values, label="rk4")
     # plt.plot(time_points, [f_actual(y) for y in time_points], label="actual")
-    # plt.legend()
-    # plt.show()
+    f_actual_arr = [f_actual(y) for y in time_points]
+    plt.plot(time_points, [abs(values[i] - f_actual_arr[i])/f_actual_arr[i] for i in range(len(values))], label="error")
+    plt.legend()
+    plt.show()
 
 
 if __name__ == "__main__":
