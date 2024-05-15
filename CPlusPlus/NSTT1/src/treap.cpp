@@ -5,11 +5,16 @@
 #include <utility>
 #include <ctime>
 #include <iostream>
+#include <stack>
+
+template <typename T>
+class TreapIterator;
 
 template <typename T>
 class Treap
 {
-private:
+
+public:
     struct Node
     {
         T key;
@@ -26,6 +31,101 @@ private:
         }
     };
 
+    Treap() : root(nullptr) {}
+
+    Treap(const Treap &other)
+    {
+        root = copyNodes(other.root);
+    }
+
+    Treap(Treap &&other) : root(other.root)
+    {
+        other.root = nullptr;
+    }
+
+    ~Treap()
+    {
+        clear(root);
+    }
+
+    void clear()
+    {
+        clear(root);
+        root = nullptr;
+    }
+
+    void insert(int key)
+    {
+        auto [l, r] = split(root, key);
+        root = merge(merge(l, new Node(key)), r);
+    }
+
+    void erase(int key)
+    {
+        auto [l, r] = split(root, key);
+        auto [l1, r1] = split(l, key - 1);
+        root = merge(l1, r);
+        delete r1;
+    }
+
+    bool contains(T value)
+    {
+        return this->containsRecursive(this->root, value);
+    }
+
+    bool empty()
+    {
+        return root == nullptr;
+    }
+
+    void getAllElements(Node *node, std::vector<T> &vec) const
+    {
+        if (node == nullptr)
+        {
+            return;
+        }
+        getAllElements(node->left, vec);
+        vec.push_back(node->key);
+        getAllElements(node->right, vec);
+    }
+
+    TreapIterator<T> iterator()
+    {
+        return TreapIterator<T>(root);
+    }
+
+    Treap &operator=(const Treap &other)
+    {
+        if (this != &other)
+        {
+            clear(root);
+            root = copyNodes(other.root);
+        }
+        return *this;
+    }
+
+    Treap &operator=(Treap &&other)
+    {
+
+        if (this != &other)
+        {
+            delete this->root;
+            this->root = other.root;
+            other.root = nullptr;
+        }
+
+        return *this;
+    }
+
+    bool operator==(const Treap<T> &other) const
+    {
+        std::vector<T> thisTreapVec, otherTreapVec;
+        getAllElements(this->root, thisTreapVec);
+        getAllElements(other.root, otherTreapVec);
+        return thisTreapVec == otherTreapVec;
+    }
+
+private:
     Node *root;
 
     Node *copyNodes(Node *node)
@@ -95,94 +195,46 @@ private:
             return r;
         }
     }
+};
+
+template <typename T>
+class TreapIterator
+{
+private:
+    std::stack<typename Treap<T>::Node *> stack;
+    typename Treap<T>::Node *current;
+
+    void pushLeft(typename Treap<T>::Node *node)
+    {
+        while (node != nullptr)
+        {
+            stack.push(node);
+            node = node->left;
+        }
+    }
 
 public:
-    Treap() : root(nullptr) {}
-
-    Treap(const Treap &other)
+    TreapIterator(typename Treap<T>::Node *root) : current(root)
     {
-        root = copyNodes(other.root);
+        pushLeft(current);
     }
 
-    Treap(Treap &&other) : root(other.root)
+    bool hasNext() const
     {
-        other.root = nullptr;
+        return !stack.empty();
     }
 
-    ~Treap()
+    T next()
     {
-        clear(root);
-    }
-
-    void clear()
-    {
-        clear(root);
-        root = nullptr;
-    }
-
-    void insert(int key)
-    {
-        auto [l, r] = split(root, key);
-        root = merge(merge(l, new Node(key)), r);
-    }
-
-    void erase(int key)
-    {
-        auto [l, r] = split(root, key);
-        auto [l1, r1] = split(l, key - 1);
-        root = merge(l1, r);
-        delete r1;
-    }
-
-    bool contains(T value)
-    {
-        return this->containsRecursive(this->root, value);
-    }
-
-    bool empty()
-    {
-        return root == nullptr;
-    }
-
-    void getAllElements(Node *node, std::vector<T> &vec) const
-    {
-        if (node == nullptr)
+        if (stack.empty())
         {
-            return;
+            throw std::out_of_range("No more elements in the Treap");
         }
-        getAllElements(node->left, vec);
-        vec.push_back(node->key);
-        getAllElements(node->right, vec);
-    }
-
-    Treap &operator=(const Treap &other)
-    {
-        if (this != &other)
-        {
-            clear(root);
-            root = copyNodes(other.root);
-        }
-        return *this;
-    }
-
-    Treap &operator=(Treap &&other)
-    {
-
-        if (this != &other)
-        {
-            delete this->root;
-            this->root = other.root;
-            other.root = nullptr;
-        }
-
-        return *this;
-    }
-
-    bool operator==(const Treap<T> &other) const
-    {
-        std::vector<T> thisTreapVec, otherTreapVec;
-        getAllElements(this->root, thisTreapVec);
-        getAllElements(other.root, otherTreapVec);
-        return thisTreapVec == otherTreapVec;
+        current = stack.top();
+        stack.pop();
+        T key = current->key;
+        current = current->right;
+        pushLeft(current);
+        return key;
     }
 };
