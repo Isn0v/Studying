@@ -120,6 +120,27 @@ TYPED_TEST(TreapTest, IteratorThrowException)
     EXPECT_THROW(it.next(), std::out_of_range);
 }
 
+TYPED_TEST(TreapTest, RangeBasedForEmpty){
+    Treap<int> emptyTreap;
+    int sum = 0;
+    for (const auto& element : emptyTreap) {
+        sum += element;
+    }
+    EXPECT_EQ(sum, 0);
+}
+
+TYPED_TEST(TreapTest, RangeBasedForWithElements){
+    Treap<int> treap;
+    treap.insert(5);
+    treap.insert(10);
+    treap.insert(15);
+    int sum = 0;
+    for (const auto& element : treap) {
+        sum += element;
+    }
+    EXPECT_EQ(sum, 30);
+}
+
 // ---------------------------------------------------------------------
 
 class MyClass : public InstanceLimiter<MyClass, 2>

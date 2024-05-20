@@ -15,6 +15,7 @@ class Treap
 {
 
 public:
+
     struct Node
     {
         T key;
@@ -33,10 +34,7 @@ public:
 
     Treap() : root(nullptr) {}
 
-    Treap(const Treap &other)
-    {
-        root = copyNodes(other.root);
-    }
+    Treap(const Treap &other) : root(copyNodes(other.root)) {}
 
     Treap(Treap &&other) : root(other.root)
     {
@@ -46,6 +44,37 @@ public:
     ~Treap()
     {
         clear(root);
+    }
+
+    Treap &operator=(const Treap &other)
+    {
+        if (this != &other)
+        {
+            clear(root);
+            root = copyNodes(other.root);
+        }
+        return *this;
+    }
+
+    Treap &operator=(Treap &&other)
+    {
+
+        if (this != &other)
+        {
+            delete this->root;
+            this->root = other.root;
+            other.root = nullptr;
+        }
+
+        return *this;
+    }
+
+    Treap(const std::vector<T> &vec)
+    {
+        for (auto &elem : vec)
+        {
+            insert(elem);
+        }
     }
 
     void clear()
@@ -94,35 +123,27 @@ public:
         return TreapIterator<T>(root);
     }
 
-    Treap &operator=(const Treap &other)
-    {
-        if (this != &other)
-        {
-            clear(root);
-            root = copyNodes(other.root);
-        }
-        return *this;
-    }
-
-    Treap &operator=(Treap &&other)
-    {
-
-        if (this != &other)
-        {
-            delete this->root;
-            this->root = other.root;
-            other.root = nullptr;
-        }
-
-        return *this;
-    }
-
     bool operator==(const Treap<T> &other) const
     {
         std::vector<T> thisTreapVec, otherTreapVec;
         getAllElements(this->root, thisTreapVec);
         getAllElements(other.root, otherTreapVec);
         return thisTreapVec == otherTreapVec;
+    }
+
+    TreapIterator<T> begin()
+    {
+        return TreapIterator<T>(root);
+    }
+
+    TreapIterator<T> end()
+    {
+        return TreapIterator<T>(nullptr);
+    }
+
+    Treap<T> copy()
+    {
+        return Treap<T>(*this);
     }
 
 private:
@@ -216,12 +237,49 @@ private:
 public:
     TreapIterator(typename Treap<T>::Node *root) : current(root)
     {
-        pushLeft(current);
+        pushLeft(root);
+    }
+
+    ~TreapIterator()
+    {
+        stack = std::stack<typename Treap<T>::Node *>();
+        // current = nullptr;
     }
 
     bool hasNext() const
     {
         return !stack.empty();
+    }
+
+    bool operator!=(const TreapIterator &other) const
+    {
+        return stack != other.stack;
+    }
+
+    TreapIterator &operator++()
+    {
+        if (stack.empty())
+        {
+            throw std::out_of_range("No more elements in the Treap");
+        }
+        current = stack.top();
+        stack.pop();
+        current = current->right;
+        pushLeft(current);
+        return *this;
+    }
+
+    T operator*() const
+    {
+        // if (current == nullptr){
+        //     throw std::out_of_range("No more elements in the Treap");
+        // }
+        return current->key;
+    }
+
+    typename Treap<T>::Node *operator->() const
+    {
+        return current;
     }
 
     T next()

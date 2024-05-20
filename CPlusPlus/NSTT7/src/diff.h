@@ -14,16 +14,14 @@ class Binary : public Expression
 {
 protected:
   std::shared_ptr<Expression> left, right;
-  // Expression *left;
-  // Expression *right;
 
 public:
   Binary(std::shared_ptr<Expression> l, std::shared_ptr<Expression> r) : left(l), right(r) {}
-  // ~Binary() override
-  // {
-  //   left.reset();
-  //   right.reset();
-  // }
+  std::stringstream toStringStreamBinary(char sign) const{
+    std::stringstream ss;
+    ss << "(" << left->toStringStream().str() << " " << sign << " " << right->toStringStream().str() << ")";
+    return ss;
+  }
 };
 
 class Unary : public Expression
@@ -44,9 +42,7 @@ public:
   std::shared_ptr<Expression> diff(const std::string &variable) const override;
   std::stringstream toStringStream() const override
   {
-    std::stringstream ss;
-    ss << "(" << left->toStringStream().str() << " + " << right->toStringStream().str() << ")";
-    return ss;
+    return toStringStreamBinary('+');
   }
 };
 
@@ -57,9 +53,7 @@ public:
   std::shared_ptr<Expression> diff(const std::string &variable) const override;
   std::stringstream toStringStream() const override
   {
-    std::stringstream ss;
-    ss << "(" << left->toStringStream().str() << " - " << right->toStringStream().str() << ")";
-    return ss;
+    return toStringStreamBinary('-');
   }
 };
 
@@ -70,9 +64,7 @@ public:
   std::shared_ptr<Expression> diff(const std::string &variable) const override;
   std::stringstream toStringStream() const override
   {
-    std::stringstream ss;
-    ss << "(" << left->toStringStream().str() << " * " << right->toStringStream().str() << ")";
-    return ss;
+    return toStringStreamBinary('*');
   }
 };
 
@@ -83,9 +75,7 @@ public:
   std::shared_ptr<Expression> diff(const std::string &variable) const override;
   std::stringstream toStringStream() const override
   {
-    std::stringstream ss;
-    ss << "(" << left->toStringStream().str() << " / " << right->toStringStream().str() << ")";
-    return ss;
+    return toStringStreamBinary('/');
   }
 };
 
@@ -96,9 +86,7 @@ public:
   std::shared_ptr<Expression> diff(const std::string &variable) const override;
   std::stringstream toStringStream() const override
   {
-    std::stringstream ss;
-    ss << "(" << left->toStringStream().str() << " ^ " << right->toStringStream().str() << ")";
-    return ss;
+    return toStringStreamBinary('^');
   }
 };
 
