@@ -16,23 +16,15 @@ protected:
   std::shared_ptr<Expression> left, right;
 
 public:
+  virtual char getSign() const = 0;
+
+
   Binary(std::shared_ptr<Expression> l, std::shared_ptr<Expression> r) : left(l), right(r) {}
-  std::stringstream toStringStreamBinary(char sign) const{
+  std::stringstream toStringStream() const{
     std::stringstream ss;
-    ss << "(" << left->toStringStream().str() << " " << sign << " " << right->toStringStream().str() << ")";
+    ss << "(" << left->toStringStream().str() << " " << getSign() << " " << right->toStringStream().str() << ")";
     return ss;
   }
-};
-
-class Unary : public Expression
-{
-protected:
-  // Expression *expression;
-  std::shared_ptr<Expression> expression;
-
-public:
-  Unary(std::shared_ptr<Expression> expr) : expression(expr) {}
-  // ~Unary() override { expression.reset(); }
 };
 
 class Add : public Binary
@@ -40,10 +32,8 @@ class Add : public Binary
 public:
   Add(std::shared_ptr<Expression> l, std::shared_ptr<Expression> r) : Binary(l, r) {}
   std::shared_ptr<Expression> diff(const std::string &variable) const override;
-  std::stringstream toStringStream() const override
-  {
-    return toStringStreamBinary('+');
-  }
+  char getSign() const override { return '+'; }
+
 };
 
 class Sub : public Binary
@@ -51,10 +41,7 @@ class Sub : public Binary
 public:
   Sub(std::shared_ptr<Expression> l, std::shared_ptr<Expression> r) : Binary(l, r) {}
   std::shared_ptr<Expression> diff(const std::string &variable) const override;
-  std::stringstream toStringStream() const override
-  {
-    return toStringStreamBinary('-');
-  }
+  char getSign() const override { return '-'; }
 };
 
 class Mult : public Binary
@@ -62,10 +49,7 @@ class Mult : public Binary
 public:
   Mult(std::shared_ptr<Expression> l, std::shared_ptr<Expression> r) : Binary(l, r) {}
   std::shared_ptr<Expression> diff(const std::string &variable) const override;
-  std::stringstream toStringStream() const override
-  {
-    return toStringStreamBinary('*');
-  }
+  char getSign() const override { return '*'; }
 };
 
 class Div : public Binary
@@ -73,10 +57,7 @@ class Div : public Binary
 public:
   Div(std::shared_ptr<Expression> l, std::shared_ptr<Expression> r) : Binary(l, r) {}
   std::shared_ptr<Expression> diff(const std::string &variable) const override;
-  std::stringstream toStringStream() const override
-  {
-    return toStringStreamBinary('/');
-  }
+  char getSign() const override { return '/'; }
 };
 
 class Exponent : public Binary
@@ -84,10 +65,7 @@ class Exponent : public Binary
 public:
   Exponent(std::shared_ptr<Expression> base, std::shared_ptr<Expression> exponent) : Binary(base, exponent) {}
   std::shared_ptr<Expression> diff(const std::string &variable) const override;
-  std::stringstream toStringStream() const override
-  {
-    return toStringStreamBinary('^');
-  }
+  char getSign() const override { return '^'; }
 };
 
 class Var : public Expression
