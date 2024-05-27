@@ -15,14 +15,13 @@ class Treap
 {
 
 public:
-
     struct Node
     {
         T key;
         int priority;
-        Node *left, *right;
+        Node *left, *right, *parent;
 
-        Node(T key) : key(key), left(nullptr), right(nullptr)
+        Node(T key, Node *parent) : key(key), left(nullptr), right(nullptr), parent(parent)
         {
             std::random_device rd;
             std::mt19937_64 gen(rd());
@@ -34,7 +33,7 @@ public:
 
     Treap() : root(nullptr) {}
 
-    Treap(const Treap &other) : root(copyNodes(other.root)) {}
+    Treap(const Treap &other) : root(copyNodes(other.root, nullptr)) {}
 
     Treap(Treap &&other) : root(other.root)
     {
@@ -51,14 +50,13 @@ public:
         if (this != &other)
         {
             clear(root);
-            root = copyNodes(other.root);
+            root = copyNodes(other.root, nullptr);
         }
         return *this;
     }
 
     Treap &operator=(Treap &&other)
     {
-
         if (this != &other)
         {
             delete this->root;
@@ -86,7 +84,7 @@ public:
     void insert(int key)
     {
         auto [l, r] = split(root, key);
-        root = merge(merge(l, new Node(key)), r);
+        root = merge(merge(l, new Node(key, nullptr)), r);
     }
 
     void erase(int key)
@@ -149,14 +147,13 @@ public:
 private:
     Node *root;
 
-    Node *copyNodes(Node *node)
+    Node *copyNodes(Node *node, Node *parent)
     {
         if (!node)
             return nullptr;
-        Node *newNode = new Node(node->key);
-        newNode->priority = node->priority;
-        newNode->left = copyNodes(node->left);
-        newNode->right = copyNodes(node->right);
+        Node *newNode = new Node(node->key, parent);
+        newNode->left = copyNodes(node->left, newNode);
+        newNode->right = copyNodes(node->right, newNode);
         return newNode;
     }
 
@@ -191,12 +188,16 @@ private:
         {
             auto [l, r] = split(t->left, key);
             t->left = r;
+            if (r)
+                r->parent = t;
             return {l, t};
         }
         else
         {
             auto [l, r] = split(t->right, key);
             t->right = l;
+            if (l)
+                l->parent = t;
             return {t, r};
         }
     }
@@ -208,72 +209,90 @@ private:
         if (l->priority > r->priority)
         {
             l->right = merge(l->right, r);
+            l->right->parent = l;
             return l;
         }
         else
         {
             r->left = merge(l, r->left);
+            r->left->parent = r;
             return r;
         }
     }
 };
-
+// =================================================================================
+// do
 template <typename T>
 class TreapIterator
 {
 private:
-    std::stack<typename Treap<T>::Node *> stack;
     typename Treap<T>::Node *current;
+    bool reverse;
 
-    void pushLeft(typename Treap<T>::Node *node)
+    typename Treap<T>::Node *advanceToNext(typename Treap<T>::Node *node, bool reverse)
     {
-        while (node != nullptr)
+        if (node == nullptr)
         {
-            stack.push(node);
-            node = node->left;
+            return nullptr;
+        }
+        if (reverse)
+        {
+            if (node->left != nullptr)
+            {
+                return advanceToNext(node->left, reverse);
+            }
+            else
+            {
+                return (node->parent == nullptr || node == node->parent->left) ? node->parent : advanceToNext(node->parent, reverse);
+            }
+        }
+        else
+        {
+            if (node->right != nullptr)
+            {
+                return advanceToNext(node->right, reverse);
+            }
+            else
+            {
+                return (node->parent == nullptr || node == node->parent->right) ? node->parent : advanceToNext(node->parent, reverse);
+            }
         }
     }
 
-public:
-    TreapIterator(typename Treap<T>::Node *root) : current(root)
+    void advanceToNext()
     {
-        pushLeft(root);
+        current = advanceToNext(current, reverse);
     }
 
-    ~TreapIterator()
-    {
-        stack = std::stack<typename Treap<T>::Node *>();
-        // current = nullptr;
-    }
+public:
+    TreapIterator(typename Treap<T>::Node *root, bool reverse = false) : current(root), reverse(reverse) {}
 
     bool hasNext() const
     {
-        return !stack.empty();
+        return current != nullptr;
     }
 
     bool operator!=(const TreapIterator &other) const
     {
-        return stack != other.stack;
+        return current != other.current;
     }
 
     TreapIterator &operator++()
     {
-        if (stack.empty())
+        if (!reverse)
         {
-            throw std::out_of_range("No more elements in the Treap");
+            advanceToNext();
+            return *this;
         }
-        current = stack.top();
-        stack.pop();
-        current = current->right;
-        pushLeft(current);
-        return *this;
+        else
+        {
+
+            throw std::runtime_error("Reverse iterator can't be incremented");
+        }
     }
 
     T operator*() const
     {
-        // if (current == nullptr){
-        //     throw std::out_of_range("No more elements in the Treap");
-        // }
         return current->key;
     }
 
@@ -284,15 +303,22 @@ public:
 
     T next()
     {
-        if (stack.empty())
+        T result = current->key;
+        advanceToNext();
+        return result;
+    }
+
+    TreapIterator operator--(int)
+    {
+        if (reverse)
         {
-            throw std::out_of_range("No more elements in the Treap");
+
+            advanceToNext();
+            return *this;
         }
-        current = stack.top();
-        stack.pop();
-        T key = current->key;
-        current = current->right;
-        pushLeft(current);
-        return key;
+        else
+        {
+            throw std::runtime_error("Forward iterator can't be decremented");
+        }
     }
 };

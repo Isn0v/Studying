@@ -20,6 +20,8 @@ private:
 
         T &operator[](size_t i) const
         {
+            if (i >= size)
+                throw std::out_of_range("Index out of range.");
             return data[i];
         }
     };
@@ -27,6 +29,8 @@ private:
 public:
     InnerMatrix operator[](size_t i) const
     {
+        if (i >= size)
+            throw std::out_of_range("Index out of range.");
         return InnerMatrix(data[i], size);
     }
 
@@ -200,7 +204,7 @@ public:
     }
 
     // why by reference?
-    SquareMatrix &operator+=(const SquareMatrix &other)
+    SquareMatrix operator+=(const SquareMatrix &other)
     {
         if (size != other.size)
         {

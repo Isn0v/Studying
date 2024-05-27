@@ -38,13 +38,13 @@ int getIndexOfFirstMatch(Checker checker, Args&&... args)
 {
     bool first = true;
     int index = 0;
-    return (0 + ... + ((checker(std::forward<Args>(args)) && first) ? (first = false, index++) : (index++, 0)));
+    return (0 + ... + ((checker(args) && first) ? (first = false, index++) : (index++, 0)));
 }
 
 int main()
 {
     int val = 5;
-    int index = getIndexOfFirstMatch(isEven<int>, 1, val + 1, 5, 6, 7);
+    int index = getIndexOfFirstMatch(isEven<int>, 1, val, 5, 6, 7);
     if (index == -1)
     {
         std::cout << "No even number found" << std::endl;

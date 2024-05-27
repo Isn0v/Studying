@@ -49,5 +49,5 @@ struct NthPrime<N, P, N>
 
 int main()
 {
-    std::cout << NthPrime<100>::value << std::endl;
+    std::cout << NthPrime<11>::value << std::endl;
 }

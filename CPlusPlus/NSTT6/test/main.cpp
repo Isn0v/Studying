@@ -88,6 +88,15 @@ TEST(SquareMatrixTest, DoubleConversion)
     ASSERT_EQ(scalar, 0);
 }
 
+TEST(SquareMatrixTest, OperatorPlusEquals)
+{
+    SquareMatrix<int> matrix(2, 2);
+    (matrix += matrix) += matrix;
+
+    
+    ASSERT_EQ(matrix, SquareMatrix<int>(2, 8));
+}
+
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);

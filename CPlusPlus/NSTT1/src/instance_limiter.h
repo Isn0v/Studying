@@ -20,7 +20,9 @@ protected:
     }
 
 public:
-    InstanceLimiter(const InstanceLimiter&) = delete;
+    InstanceLimiter(const InstanceLimiter&){
+        instance_count++;
+    }
     InstanceLimiter& operator=(const InstanceLimiter&) = delete;
 
     static int getInstanceCount() {
