@@ -33,6 +33,17 @@ public:
     T *ptr = (T *)((char *)memory + offset);
     return *ptr;
   }
+
+  ~Container() {
+    auto destructor = [&, offset = 0](auto arg) mutable {
+      decltype(arg) *ptr = (decltype(arg) *)((char *)memory + offset);
+      (*ptr).~decltype(arg)();
+      offset += sizeof(decltype(arg));
+    };
+
+    size_t index = 0;
+    (destructor(std::forward<Types>(getElement<Types>(index++))), ...);
+  }
 };
 
 struct Point {
@@ -40,7 +51,4 @@ struct Point {
   int y;
 
   constexpr Point(int x, int y) : x(x), y(y) {}
-
-  double getX() const { return x; }
-  double getY() const { return y; }
 };
