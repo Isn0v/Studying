@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.27)
-project(NSTT13)
+project(NSTT15)
 
 # enable_testing()
 

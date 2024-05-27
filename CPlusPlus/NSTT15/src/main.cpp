@@ -1,57 +1,59 @@
 #include <iostream>
 
-template <typename T>
-bool isEven(T number)
-{
-    return number % 2 == 0;
-}
+template <typename... Types> class Container {
+private:
+  void *memory;
 
-// template <typename Checker, typename None = void>
-// bool isMatch(Checker checker, int &index)
-// {
-//     return false;
-// }
+public:
+  Container(Types... args) {
+    size_t size = (0 + ... + sizeof(Types));
 
-// template <typename Checker, typename FirstArg, typename... Args>
-// bool isMatch(Checker checker, int &index, FirstArg &&firstArg, Args... args)
-// {
-//     if (checker(std::forward<FirstArg>(firstArg)))
-//     {
-//         return true;
-//     }
-//     else
-//     {
-//         index++;
-//         return isMatch(checker, index, args...);
-//     }
-// }
+    memory = new char[size];
 
-// template <typename Checker, typename... Args>
-// int getIndexOfFirstMatch(Checker checker, Args... args)
-// {
-//     int index = 0;
-//     return isMatch(checker, index, args...) ? index : -1;
-// }
+    auto assign = [&, offset = 0](auto arg) mutable {
+      decltype(arg) *ptr = (decltype(arg) *)((char *)memory + offset);
+      *ptr = arg;
+      offset += sizeof(decltype(arg));
+    };
 
-template <typename Checker, typename... Args>
-int getIndexOfFirstMatch(Checker checker, Args&&... args)
-{
-    bool first = true;
-    int index = 0;
-    return (0 + ... + ((checker(args) && first) ? (first = false, index++) : (index++, 0)));
-}
+    (assign(args), ...);
+  }
 
-int main()
-{
-    int val = 5;
-    int index = getIndexOfFirstMatch(isEven<int>, 1, val, 5, 6, 7);
-    if (index == -1)
-    {
-        std::cout << "No even number found" << std::endl;
+  ~Container() { delete[] memory; }
+
+  template <typename T> T getElement(size_t index) {
+    if (index >= sizeof...(Types)) {
+      throw std::out_of_range("Index out of range");
     }
-    else
-    {
-        std::cout << "The first even number is at index " << index << std::endl;
-    }
-    return 0;
+
+    size_t cur_index = 0;
+    size_t offset = (0 + ... + (cur_index++ < index ? sizeof(Types) : 0));
+
+    T *ptr = (T *)((char *)memory + offset);
+    return *ptr;
+  }
+};
+
+struct Point {
+  int x;
+  int y;
+
+  Point(int x, int y) : x(x), y(y) {}
+
+  double getX() const { return x; }
+  double getY() const { return y; }
+};
+
+int main() {
+  int a = 12;
+  char b = 'c';
+  Point c(2, 3);
+  Container<int, char, Point> d(a, b, c);
+
+  std::cout << d.getElement<int>(0) << std::endl;
+  std::cout << d.getElement<char>(1) << std::endl;
+  std::cout << d.getElement<Point>(2).x << " " << d.getElement<Point>(2).y
+            << std::endl;
+
+  return 0;
 }
