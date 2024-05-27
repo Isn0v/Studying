@@ -4,10 +4,11 @@
 #include <utility> // for forward
 
 template <size_t SIZE, typename... Types>
-void allocate(void *memory, Types &&...args) {
+constexpr void allocate(void *memory, Types &&...args) {
   size_t requiredSize = (0 + ... + sizeof(std::decay_t<Types>));
+  bool typesCopyConstructible = (... && std::is_copy_constructible_v<Types>);
 
-  if (requiredSize > SIZE) {
+  if (requiredSize > SIZE && !typesCopyConstructible) {
     throw std::bad_alloc();
   }
 
@@ -24,9 +25,9 @@ void allocate(void *memory, Types &&...args) {
 int main() {
 
   constexpr int SIZE = 64;
-  int N = 3;
-  double PI = 3.14;
-  char C = 'a';
+  constexpr int N = 3;
+  constexpr double PI = 3.14;
+  constexpr char C = 'a';
 
   char memory[SIZE];
   allocate<SIZE>(memory, N, PI, C);
