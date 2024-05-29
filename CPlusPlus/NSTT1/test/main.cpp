@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
-// #include "../src/treap.cpp"
-#include <treap.cpp>
+#include <treap.h>
 #include <instance_limiter.h>
 
 template <typename T>
@@ -8,6 +7,7 @@ class TreapTest : public ::testing::Test
 {
 protected:
     Treap<T> treap;
+
 };
 
 typedef ::testing::Types<int> Implementations;
@@ -86,18 +86,20 @@ TYPED_TEST(TreapTest, IteratorBegin)
     this->treap.insert(5);
     this->treap.insert(15);
 
-    TreapIterator<int> it = this->treap.iterator();
+    auto it = this->treap.iterator();
     EXPECT_TRUE(it.hasNext());
-    EXPECT_EQ(it.next(), 10);
+    EXPECT_EQ(it.next(), 5);
 }
 
 TYPED_TEST(TreapTest, IteratorTraversal)
 {
-    this->treap.insert(10);
-    this->treap.insert(5);
-    this->treap.insert(15);
+    Treap<int> a;
 
-    TreapIterator<int> it = this->treap.iterator();
+    a.insert(10);
+    a.insert(5);
+    a.insert(15);
+
+    auto it = a.iterator();
     std::vector<int> elements;
     while (it.hasNext())
     {
@@ -109,14 +111,14 @@ TYPED_TEST(TreapTest, IteratorTraversal)
 TYPED_TEST(TreapTest, IteratorNoElements)
 {
     Treap<int> emptyTreap;
-    TreapIterator<int> it = emptyTreap.iterator();
+    auto it = emptyTreap.iterator();
     EXPECT_FALSE(it.hasNext());
 }
 
 TYPED_TEST(TreapTest, IteratorThrowException)
 {
     Treap<int> emptyTreap;
-    TreapIterator<int> it = emptyTreap.iterator();
+    auto it = emptyTreap.iterator();
     EXPECT_THROW(it.next(), std::out_of_range);
 }
 

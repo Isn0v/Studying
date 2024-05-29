@@ -18,6 +18,6 @@ find_package(GTest)
 
 add_executable(${BINARY} ${TEST_SOURCES})
 
-gtest_add_tests(TARGET ${BINARY})
+gtest_discover_tests(${BINARY})
 
 target_link_libraries(${BINARY} PUBLIC ${CMAKE_PROJECT_NAME}_lib gtest gmock)

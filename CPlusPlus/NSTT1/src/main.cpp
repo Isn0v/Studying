@@ -1,24 +1,21 @@
-#include "treap.cpp"
+#include "treap.h"
 // #include "instance_limiter.h"
 #include <iostream>
+#include <stdexcept>
 #include <string.h>
 
-
-#include <stdexcept>
-
-
-// Usage:
-
-
 int main() {
-    // Treap<int> treap;
-    // treap.insert(5);
+  Treap<int> a;
+
+  a.insert(10);
+  a.insert(5);
+  a.insert(15);
 
 
-    // Treap<int> other;
-    // other.insert(5);
+  auto it = a.iterator();
+  while(it.hasNext()) {
+    std::cout << it.next() << std::endl;
+  }
 
-    // bool res = (treap == other);
-    // std::cout << res << std::endl;
     return 0;
 }
