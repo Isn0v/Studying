@@ -7,6 +7,13 @@
 #include <stack>
 #include <utility>
 
+std::random_device rd;
+// auto seed = rd();
+auto seed = 3718554003;
+
+std::mt19937_64 gen(seed);
+std::uniform_int_distribution<int> dis;
+
 template <typename T> class Treap {
 
 private:
@@ -17,9 +24,6 @@ private:
 
     Node(T key, Node *parent)
         : key(key), left(nullptr), right(nullptr), parent(parent) {
-      std::random_device rd;
-      std::mt19937_64 gen(rd());
-      std::uniform_int_distribution<int> dis;
 
       priority = dis(gen);
     }
@@ -34,6 +38,34 @@ private:
       if (!right)
         return this;
       return right->rightMost();
+    }
+
+    std::pair<Treap<T>::Node *, Treap<T>::Node *> split(T value) {
+      if (key < value) {
+        if (!right)
+          return [ this, nullptr ];
+        auto [leftNode, rightNode] = right->split(value);
+        return [ this, rightNode ];
+      } else {
+        if (!left)
+          return [ nullptr, this ];
+        auto [leftNode, rightNode] = left->split(value);
+        return [ leftNode, this ];
+      }
+    }
+
+    Treap<T>::Node *merge(Treap<T>::Node *other) {
+      if (!other)
+        return this;
+      if (key < other->key) {
+        if (!right)
+          return [ this, other ];
+        return right->merge(other);
+      } else {
+        if (!left)
+          return [ other, this ];
+        return left->merge(other);
+      }
     }
 
     bool operator==(const Node &other) const {
@@ -71,48 +103,6 @@ private:
       clear(t->right);
       delete t;
     }
-  }
-
-  void insert(Node *&t, Node *it) {
-    if (!t)
-      t = it;
-    else if (it->priority > t->priority)
-      split(t, it->key, it->left, it->right), t = it;
-    else
-      insert(t->key <= it->key ? t->right : t->left, it);
-  }
-
-  void erase(Node *&t, int key) {
-    if (t->key == key) {
-      Node* th = t;
-      merge(t, t->left, t->right);
-      delete th;
-    } else
-      erase(key < t->key ? t->left : t->right, key);
-  }
-
-  void split(Node *t, T key, Node *&l, Node *&r) {
-    if (!t) {
-      l = nullptr;
-      r = nullptr;
-      return;
-    }
-    if (t->key < key) {
-      split(t->right, key, t->right, r);
-      l = t;
-    } else {
-      split(t->left, key, l, t->left);
-      r = t;
-    }
-  }
-
-  void merge(Node* &t, Node* l, Node* r) {
-    if (!l || !r)
-      t = l ? l : r;
-    else if (l->priority > r->priority)
-      merge(l->right, l->right, r), t = l;
-    else
-      merge(r->left, l, r->left), t = r;
   }
 
 public:
@@ -183,7 +173,9 @@ public:
     }
   };
 
-  Treap() : root(nullptr) {}
+  Treap() : root(nullptr) {
+    std::cout << "Treap created with seed: " << seed << std::endl;
+  }
 
   Treap(const Treap &other) : root(copyNodes(other.root, nullptr)) {}
 
@@ -237,7 +229,13 @@ public:
     getAllElements(node->right, vec);
   }
 
-  TreapIterator iterator() { return TreapIterator(root); }
+  TreapIterator iterator(bool reverse = false) {
+    if (!reverse) {
+      return TreapIterator(root->leftMost(), false);
+    } else {
+      return TreapIterator(root->rightMost(), true);
+    }
+  }
 
   bool operator==(const Treap<T> &other) const {
     std::vector<T> thisTreapVec, otherTreapVec;
