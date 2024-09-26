@@ -154,9 +154,9 @@ def second_task():
     
     time_points, x_values, y_values = rk4_system(lotka_volterra_1, lotka_volterra_2, initaial_values[0], initaial_values[1], 0, 10, 1000)
     
-    # plt.plot(time_points, x_values, label="prey")
-    # plt.plot(time_points, y_values, label="predator")
-    plt.plot(x_values, y_values, label="predator-prey")
+    plt.plot(time_points, x_values, label="prey")
+    plt.plot(time_points, y_values, label="predator")
+    # plt.plot(x_values, y_values, label="predator-prey")
     # plt.plot(y_values, x_values, label="predator-prey")
     plt.legend()
     
@@ -192,5 +192,5 @@ def first_task():
 
 if __name__ == "__main__":
     # first_task()
-    # second_task()
-    third_task()
+    second_task()
+    # third_task()

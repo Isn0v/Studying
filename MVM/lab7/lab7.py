@@ -45,8 +45,9 @@ def inverse_iteration(a, b, c, E_guess, tol=1e-8, max_iters=100):
 
         shift = shift_new
         phi = phi_new
+        print(abs(0.5 - shift))
 
-    return shift_new, phi_new, E_array
+    return shift_new, phi_new, E_array, i
 
 
 def draw(x, y, label):
@@ -54,7 +55,7 @@ def draw(x, y, label):
 
 
 def solve_shredinger():
-    N = 100  
+    N = 100000
     L = 10   
     x = np.linspace(-L / 2, L / 2, N)
     h = x[1] - x[0]
@@ -78,14 +79,17 @@ def solve_shredinger():
 
 
     
-    E_guess = -100
-    E_approx, phi_approx, E_array = inverse_iteration(a, b, c, E_guess, tol, max_iters)
+    E_guess = 0
+    iters_used = 0
+    E_approx, phi_approx, E_array, iters_used = inverse_iteration(a, b, c, E_guess, tol, max_iters)
     iters = [i for i in range(0, len(E_array))]
-    draw(x, phi_approx, "Energy eigenvalue: " + str(E_approx))
+    # draw(x, phi_approx, "Energy eigenvalue: " + str(E_approx))
     # draw(iters, E_array, "Energy eigenvalue from 1")
     # print(E_array)
-    plt.legend(loc="upper right")
-    plt.show()
+    # plt.legend(loc="upper right")
+    # plt.show()
+    # print(abs(E_approx - 0.5))
+    # print("iters_used: ", iters_used)
     # print("E_approx: ", E_approx)
     # print("phi_approx: ", phi_approx)
 
